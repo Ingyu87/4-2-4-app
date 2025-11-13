@@ -1,4 +1,4 @@
-import { currentUserJourney, currentArticleData, currentArticleId } from './config.js';
+import { currentUserJourney, currentArticleData, currentArticleId, setCurrentUserJourney, setCurrentArticleData, setCurrentArticleId } from './config.js';
 import { showResumeModal, repopulateUiForResume, showStep, showView, showModal } from './ui.js';
 
 // 로컬 저장소 로드
@@ -16,9 +16,9 @@ export async function loadStateFromLocal() {
 
             if (userWantsToContinue) {
                 console.log("이전 활동 이어서 시작:", lastStep);
-                Object.assign(currentUserJourney, journey);
-                Object.assign(currentArticleData, article);
-                currentArticleId = article.id;
+                setCurrentUserJourney(journey);
+                setCurrentArticleData(article);
+                setCurrentArticleId(article.id);
 
                 repopulateUiForResume(lastStep);
                 showStep(lastStep);

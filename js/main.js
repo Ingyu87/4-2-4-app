@@ -1,4 +1,4 @@
-import { geminiApiKey, setGeminiApiKey, userNickname, setUserNickname, currentUserJourney, currentArticleData, currentArticleId } from './config.js';
+import { geminiApiKey, setGeminiApiKey, userNickname, setUserNickname, currentUserJourney, currentArticleData, currentArticleId, setCurrentUserJourney, setCurrentArticleData, setCurrentArticleId } from './config.js';
 import { checkSafety } from './api.js';
 import { loadStateFromLocal, saveStateToLocal } from './storage.js';
 import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint } from './ui.js';
@@ -134,9 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 보고서에서 '새 활동' 버튼
     document.getElementById("restart-button-report").addEventListener("click", () => {
         localStorage.clear();
-        Object.assign(currentUserJourney, {});
-        currentArticleData = null;
-        currentArticleId = null;
+        setCurrentUserJourney({});
+        setCurrentArticleData(null);
+        setCurrentArticleId(null);
         showView("config-view");
     });
     
