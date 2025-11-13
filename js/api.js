@@ -288,7 +288,7 @@ export async function generateText(type, topic) {
     
     const difficulty = "상";
     const difficultyMap = {
-        "상": "초등학교 4학년 수준보다 약간 더 심화된 어휘를 사용하고 문단이 4-5개인 글 (약 600-800자)",
+        "상": "초등학교 4학년 수준의 어휘를 사용하고, 최소 5문단 이상이며, 각 문단에 5문장 이상이 포함된 글 (약 800-1200자)",
         "중": "적절한 어휘를 사용하고 문단이 3-4개인 글",
         "하": "쉽고 짧은 문장을 사용하고 문단이 2-3개인 글"
     };
@@ -306,6 +306,12 @@ export async function generateText(type, topic) {
         초등학교 4학년 학생을 위한 '${typeMap[type]}'을(를) 생성해줘.
         난이도는 '${difficultyMap[difficulty]}' 수준이어야 해.
         ${topicPrompt}
+        
+        [중요한 요구사항]
+        - 반드시 최소 5문단 이상으로 작성해줘.
+        - 각 문단은 최소 5문장 이상이어야 해.
+        - 문단 구분은 \\n\\n을 사용해줘.
+        - 초등학교 4학년 수준의 어휘와 문장 구조를 사용해줘.
         
         반드시 다음 JSON 형식에 맞춰서 응답해줘.
         {
