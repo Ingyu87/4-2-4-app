@@ -506,11 +506,55 @@ export async function handleEditSave(stepKey) {
             return;
         }
     } else if (stepKey === 'during-read') {
-        value = document.getElementById("edit-duringread-question").value.trim();
-        if (value === "") {
-            showModal("알림", "질문을 입력해주세요.");
+        // '읽기 중' 수정 시에는 질문-답 쌍을 처리
+        const container = document.getElementById("edit-duringread-questions-container");
+        if (!container) {
+            showModal("알림", "질문 컨테이너를 찾을 수 없습니다.");
             return;
         }
+        
+        const questionItems = container.querySelectorAll('.question-item');
+        
+        if (questionItems.length === 0) {
+            showModal("알림", "최소 하나의 질문을 추가해주세요.");
+            return;
+        }
+        
+        const questions = [];
+        let allValid = true;
+        
+        for (const item of questionItems) {
+            const questionId = item.dataset.questionId;
+            const typeSelect = item.querySelector(`.question-type[data-question-id="${questionId}"]`);
+            const questionTextarea = item.querySelector(`.question-text[data-question-id="${questionId}"]`);
+            const answerTextarea = item.querySelector(`.question-answer[data-question-id="${questionId}"]`);
+            
+            if (!typeSelect || !questionTextarea || !answerTextarea) {
+                console.error("질문 필드를 찾을 수 없습니다:", questionId);
+                continue;
+            }
+            
+            const type = typeSelect.value;
+            const question = questionTextarea.value.trim();
+            const answer = answerTextarea.value.trim();
+            
+            if (question === "") {
+                showModal("알림", "모든 질문을 입력해주세요.");
+                allValid = false;
+                break;
+            }
+            questions.push({ type, question, answer });
+        }
+        
+        if (!allValid) return;
+        
+        // 질문들을 하나의 텍스트로 합치기 (기존 호환성 유지)
+        value = questions.map((q, idx) => {
+            const typeLabel = currentArticleData.type === '설명하는 글'
+                ? { center: '중심 내용', new: '새로운 사실', detail: '세부 내용', why: '이유/원인', other: '기타' }[q.type] || '기타'
+                : { opinion: '글쓴이 의견', reason: '이유 타당성', compare: '생각 비교', critique: '비판적 사고', other: '기타' }[q.type] || '기타';
+            return `[${typeLabel}] ${q.question}${q.answer ? `\n답: ${q.answer}` : ''}`;
+        }).join('\n\n');
     } else if (stepKey === 'adjustment') {
         const choice = document.querySelector('input[name="edit-adjustment-choice"]:checked')?.value;
         if (!choice) {
@@ -544,7 +588,29 @@ export async function handleEditSave(stepKey) {
         const safetyResult = await saveActivity("during-read", value, { isRevision: true });
         hideLoading();
         if (safetyResult !== "SAFE") return;
+        
+        // 질문 배열도 업데이트
+        const container = document.getElementById("edit-duringread-questions-container");
+        const questionItems = container.querySelectorAll('.question-item');
+        const questions = [];
+        
+        for (const item of questionItems) {
+            const questionId = item.dataset.questionId;
+            const typeSelect = item.querySelector(`.question-type[data-question-id="${questionId}"]`);
+            const questionTextarea = item.querySelector(`.question-text[data-question-id="${questionId}"]`);
+            const answerTextarea = item.querySelector(`.question-answer[data-question-id="${questionId}"]`);
+            
+            if (typeSelect && questionTextarea && answerTextarea) {
+                questions.push({
+                    type: typeSelect.value,
+                    question: questionTextarea.value.trim(),
+                    answer: answerTextarea.value.trim()
+                });
+            }
+        }
+        
         journey.steps['during-read'].v2 = value;
+        journey.steps['during-read'].questions = questions;
     } else if (stepKey === 'adjustment') {
         const choice = document.querySelector('input[name="edit-adjustment-choice"]:checked').value;
         if (choice === 'yes') {
