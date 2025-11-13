@@ -163,11 +163,18 @@ export function handleEditStep(stepId, stepKey) {
             ? "예) 이 문단에서 가장 중요한 내용은 무엇일까? / ...은 왜 ...일까?"
             : "예) 글쓴이의 주장은 ...인데, 그 이유는 타당할까? / 나라면 ...라고 주장하겠다.";
         
+        const articleBody = article.body ? article.body.split('\n\n').map(p => `<p>${p}</p>`).join('') : '';
+        
         modalBody = `
             <div class="mb-4">
-                <button class="btn-view-article-in-edit w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm">
-                    📖 글 다시 보기
+                <button id="toggle-article-in-edit" class="w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm flex items-center justify-center">
+                    <span>📖 글 보기</span>
+                    <span class="ml-2">▼</span>
                 </button>
+                <div id="article-content-in-edit" class="hidden mt-3 bg-gray-50 p-4 rounded-xl max-h-60 overflow-y-auto prose max-w-none text-sm">
+                    <h3 class="text-lg font-bold mb-2">${article.title}</h3>
+                    ${articleBody}
+                </div>
             </div>
             <label class="block text-lg font-semibold text-gray-800 mb-2">${label}</label>
             <textarea id="edit-duringread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="${placeholder}">${currentValue}</textarea>
@@ -242,6 +249,24 @@ export function handleEditStep(stepId, stepKey) {
     document.getElementById("edit-modal-title").textContent = modalTitle;
     document.getElementById("edit-modal-body").innerHTML = modalBody;
     document.getElementById("edit-modal").classList.remove("hidden");
+    
+    // 읽기 중 수정 모달에서 글 보기 토글 기능
+    if (stepKey === 'during-read') {
+        const toggleBtn = document.getElementById("toggle-article-in-edit");
+        const articleContent = document.getElementById("article-content-in-edit");
+        if (toggleBtn && articleContent) {
+            toggleBtn.addEventListener('click', () => {
+                const isHidden = articleContent.classList.contains('hidden');
+                if (isHidden) {
+                    articleContent.classList.remove('hidden');
+                    toggleBtn.querySelector('span:last-child').textContent = '▲';
+                } else {
+                    articleContent.classList.add('hidden');
+                    toggleBtn.querySelector('span:last-child').textContent = '▼';
+                }
+            });
+        }
+    }
     
     if (stepKey === 'adjustment') {
         const radios = document.querySelectorAll('input[name="edit-adjustment-choice"]');

@@ -1,4 +1,5 @@
 import { currentArticleData, currentUserJourney } from './config.js';
+import { addQuestionField } from './activities.js';
 
 // 뷰 관리자
 export function showView(viewId) {
@@ -112,16 +113,40 @@ export function repopulateUiForResume(stepId) {
     document.getElementById("duringread-title").textContent = article.title;
     document.getElementById("duringread-body").innerHTML = article.body.split('\n\n').map(p => `<p>${p}</p>`).join('');
     const duringReadLabel = document.getElementById("duringread-label");
-    const duringReadQuestion = document.getElementById("duringread-question");
+    const questionsContainer = document.getElementById("duringread-questions-container");
+    
     if (article.type === '설명하는 글') {
         duringReadLabel.textContent = "글을 읽으며 중심 내용이나 새롭게 알게 된 사실에 대해 질문을 만들어 보세요.";
-        duringReadQuestion.placeholder = "예) 이 문단에서 가장 중요한 내용은 무엇일까? / ...은 왜 ...일까?";
     } else { 
         duringReadLabel.textContent = "글을 읽으며 글쓴이의 의견이나 그 이유가 적절한지 질문을 만들어 보세요.";
-        duringReadQuestion.placeholder = "예) 글쓴이의 주장은 ...인데, 그 이유는 타당할까? / 나라면 ...라고 주장하겠다.";
     }
-    if (journey.steps['during-read']) {
-        duringReadQuestion.value = journey.steps['during-read'].v1 || '';
+    
+    // 질문 컨테이너 초기화
+    questionsContainer.innerHTML = '';
+    
+    // 저장된 질문이 있으면 복원
+    if (journey.steps['during-read'] && journey.steps['during-read'].questions) {
+        const savedQuestions = journey.steps['during-read'].questions;
+        savedQuestions.forEach((q, idx) => {
+            questionCounter = idx + 1;
+            addQuestionField();
+            const lastItem = questionsContainer.lastElementChild;
+            if (lastItem) {
+                lastItem.querySelector('.question-type').value = q.type || 'other';
+                lastItem.querySelector('.question-text').value = q.question || '';
+                lastItem.querySelector('.question-answer').value = q.answer || '';
+            }
+        });
+    } else if (journey.steps['during-read'] && journey.steps['during-read'].v1) {
+        // 기존 형식 호환성: 첫 번째 질문 추가하고 값 설정
+        addQuestionField();
+        const firstItem = questionsContainer.firstElementChild;
+        if (firstItem) {
+            firstItem.querySelector('.question-text').value = journey.steps['during-read'].v1 || '';
+        }
+    } else {
+        // 새로 시작: 첫 번째 질문 추가
+        addQuestionField();
     }
 
     // 3단계 (읽기 조정) UI

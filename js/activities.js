@@ -48,24 +48,108 @@ export async function handlePreReadSubmit() {
     if (isRevision) buildFeedbackSummaryView(); 
 }
 
+// 질문 추가 함수
+let questionCounter = 0;
+export function addQuestionField() {
+    const container = document.getElementById("duringread-questions-container");
+    const questionId = `question-${questionCounter++}`;
+    
+    const questionTypes = currentArticleData.type === '설명하는 글'
+        ? [
+            { value: 'center', label: '중심 내용 찾기' },
+            { value: 'new', label: '새롭게 알게 된 사실' },
+            { value: 'detail', label: '세부 내용 파악' },
+            { value: 'why', label: '이유/원인 찾기' },
+            { value: 'other', label: '기타' }
+        ]
+        : [
+            { value: 'opinion', label: '글쓴이의 의견' },
+            { value: 'reason', label: '이유의 타당성' },
+            { value: 'compare', label: '자신의 생각과 비교' },
+            { value: 'critique', label: '비판적 사고' },
+            { value: 'other', label: '기타' }
+        ];
+    
+    const questionHtml = `
+        <div class="question-item bg-gray-50 p-4 rounded-xl border-2 border-gray-200" data-question-id="${questionId}">
+            <div class="flex justify-between items-center mb-2">
+                <label class="text-sm font-semibold text-gray-700">질문 종류</label>
+                <button class="remove-question text-red-500 hover:text-red-700 text-sm font-semibold" data-question-id="${questionId}">삭제</button>
+            </div>
+            <select class="question-type w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" data-question-id="${questionId}">
+                ${questionTypes.map(type => `<option value="${type.value}">${type.label}</option>`).join('')}
+            </select>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">질문</label>
+            <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요"></textarea>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">답</label>
+            <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요"></textarea>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', questionHtml);
+    
+    // 삭제 버튼 이벤트
+    const removeBtn = container.querySelector(`.remove-question[data-question-id="${questionId}"]`);
+    removeBtn.addEventListener('click', () => {
+        const item = container.querySelector(`.question-item[data-question-id="${questionId}"]`);
+        if (item) item.remove();
+    });
+}
+
 // 2단계: 읽기 중
 export async function handleDuringReadSubmit() {
     const isRevision = !!currentUserJourney.steps['during-read'];
-    const question = document.getElementById("duringread-question").value;
-    if (question.trim() === "") {
-        showModal("알림", "질문을 입력해주세요.");
+    const container = document.getElementById("duringread-questions-container");
+    const questionItems = container.querySelectorAll('.question-item');
+    
+    if (questionItems.length === 0) {
+        showModal("알림", "최소 하나의 질문을 추가해주세요.");
         return;
     }
-
+    
+    const questions = [];
+    let allValid = true;
+    
+    for (const item of questionItems) {
+        const questionId = item.dataset.questionId;
+        const type = item.querySelector(`.question-type[data-question-id="${questionId}"]`).value;
+        const question = item.querySelector(`.question-text[data-question-id="${questionId}"]`).value.trim();
+        const answer = item.querySelector(`.question-answer[data-question-id="${questionId}"]`).value.trim();
+        
+        if (question === "") {
+            showModal("알림", "모든 질문을 입력해주세요.");
+            allValid = false;
+            break;
+        }
+        
+        questions.push({ type, question, answer });
+    }
+    
+    if (!allValid) return;
+    
+    // 질문들을 하나의 텍스트로 합치기 (기존 호환성 유지)
+    const questionText = questions.map((q, idx) => {
+        const typeLabel = currentArticleData.type === '설명하는 글'
+            ? { center: '중심 내용', new: '새로운 사실', detail: '세부 내용', why: '이유/원인', other: '기타' }[q.type] || '기타'
+            : { opinion: '글쓴이 의견', reason: '이유 타당성', compare: '생각 비교', critique: '비판적 사고', other: '기타' }[q.type] || '기타';
+        return `[${typeLabel}] ${q.question}${q.answer ? `\n답: ${q.answer}` : ''}`;
+    }).join('\n\n');
+    
     showLoading("내용을 검토하고 저장 중입니다...");
-    const safetyResult = await saveActivity("during-read", question, { isRevision });
+    const safetyResult = await saveActivity("during-read", questionText, { isRevision });
     hideLoading();
     if (safetyResult !== "SAFE") return;
 
     if (!isRevision) {
-        currentUserJourney.steps['during-read'] = { v1: question, feedback: null, v2: null };
+        currentUserJourney.steps['during-read'] = { 
+            v1: questionText, 
+            feedback: null, 
+            v2: null,
+            questions: questions // 질문 배열도 저장
+        };
     } else {
-        currentUserJourney.steps['during-read'].v2 = question;
+        currentUserJourney.steps['during-read'].v2 = questionText;
+        currentUserJourney.steps['during-read'].questions = questions;
     }
 
     repopulateUiForResume('step-3-adjustment');

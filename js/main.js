@@ -2,9 +2,9 @@ import { geminiApiKey, setGeminiApiKey, userNickname, setUserNickname, currentUs
 import { checkSafety } from './api.js';
 import { loadStateFromLocal, saveStateToLocal } from './storage.js';
 import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint } from './ui.js';
-import { handleGenerateContent, handlePreReadSubmit, handleDuringReadSubmit, handleAdjustmentSubmit, handlePostReadSubmit } from './activities.js';
+import { handleGenerateContent, handlePreReadSubmit, handleDuringReadSubmit, handleAdjustmentSubmit, handlePostReadSubmit, addQuestionField } from './activities.js';
 import { buildFeedbackSummaryView, handleGetAllFeedback, handleEditStep } from './feedback.js';
-import { buildReport, downloadReport, downloadArticlePNG, downloadActivitiesPNG } from './report.js';
+import { buildReport, downloadReport } from './report.js';
 
 // 초기화
 function initializeApp() {
@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("generate-button").addEventListener("click", handleGenerateContent);
     document.getElementById("preread-submit").addEventListener("click", handlePreReadSubmit);
     document.getElementById("duringread-submit").addEventListener("click", handleDuringReadSubmit);
+    document.getElementById("duringread-add-question").addEventListener("click", addQuestionField);
     document.getElementById("adjustment-submit").addEventListener("click", handleAdjustmentSubmit);
     document.getElementById("postread-submit").addEventListener("click", handlePostReadSubmit);
     document.getElementById("preread-hint").addEventListener("click", () => showHint('pre'));
@@ -126,10 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 종합 피드백 '모두 받기' 버튼
     document.getElementById("feedback-get-all-button").addEventListener("click", handleGetAllFeedback);
 
-    // 보고서 다운로드 버튼들
+    // 보고서 다운로드 버튼
     document.getElementById("download-report-button").addEventListener("click", downloadReport);
-    document.getElementById("download-article-button").addEventListener("click", downloadArticlePNG);
-    document.getElementById("download-activities-button").addEventListener("click", downloadActivitiesPNG);
     
 
     // 보고서에서 '새 활동' 버튼
