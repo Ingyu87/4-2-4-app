@@ -40,8 +40,17 @@ select.input-field-box {
     @apply bg-green-50 border-l-4 border-green-400 p-4 rounded-lg text-green-800;
 }
 #report-content .prose ul { @apply list-disc pl-5; }
-#report-content .prose p { @apply mb-2; }
+#report-content .prose p { 
+    @apply mb-2; 
+    text-indent: 1em; /* 문단 첫 줄 들여쓰기 */
+}
 #report-content .prose strong { @apply font-bold; }
+
+/* 읽기 중 화면 및 모달의 문단 첫 줄 들여쓰기 */
+#duringread-body p,
+.prose p {
+    text-indent: 1em; /* 문단 첫 줄 들여쓰기 */
+}
 /* 보고서 표 스타일 */
 #report-content table {
     @apply text-sm md:text-base;
