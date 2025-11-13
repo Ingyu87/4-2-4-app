@@ -153,8 +153,22 @@ export async function handleGetAllFeedback() {
     }
 
     setIsFeedbackRunning(false);
-    feedbackBtn.classList.add("hidden");
     saveStateToLocal('step-7-feedback-summary');
+    
+    // 피드백 요약 화면 다시 빌드하여 결과 표시
+    buildFeedbackSummaryView();
+    
+    // 버튼 상태 업데이트
+    const needsFeedback = newFeedbackQueue.some(step => {
+        const stepData = currentUserJourney.steps[step.key];
+        return stepData?.v1 && !stepData?.feedback && stepData?.choice !== 'no';
+    });
+    if (!needsFeedback) {
+        feedbackBtn.classList.add("hidden");
+    } else {
+        feedbackBtn.disabled = false;
+        feedbackBtn.innerHTML = "🤖 AI 피드백 한번에 받기";
+    }
 }
 
 // 수정 버튼 핸들러 (모달 방식)

@@ -44,10 +44,18 @@ export async function handlePreReadSubmit() {
     repopulateUiForResume('step-2-duringread');
     saveStateToLocal('step-2-duringread'); 
     
-    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-2-duringread';
-    showStep(nextStep);
-    updateNavigationBar(nextStep);
-    if (isRevision) buildFeedbackSummaryView(); 
+    // 네비게이션 바 업데이트 (자동 체크 표시)
+    updateNavigationBar('step-1-preread');
+    
+    // 수정 모드가 아니면 현재 단계에 머물기
+    if (!isRevision) {
+        showStep('step-1-preread');
+    } else {
+        const nextStep = 'step-7-feedback-summary';
+        showStep(nextStep);
+        updateNavigationBar(nextStep);
+        buildFeedbackSummaryView();
+    }
 }
 
 // 질문 추가 함수
@@ -176,10 +184,18 @@ export async function handleDuringReadSubmit() {
     repopulateUiForResume('step-3-adjustment');
     saveStateToLocal('step-3-adjustment');
     
-    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-3-adjustment';
-    showStep(nextStep);
-    updateNavigationBar(nextStep);
-    if (isRevision) buildFeedbackSummaryView();
+    // 네비게이션 바 업데이트 (자동 체크 표시)
+    updateNavigationBar('step-2-duringread');
+    
+    // 수정 모드가 아니면 현재 단계에 머물기
+    if (!isRevision) {
+        showStep('step-2-duringread');
+    } else {
+        const nextStep = 'step-7-feedback-summary';
+        showStep(nextStep);
+        updateNavigationBar(nextStep);
+        buildFeedbackSummaryView();
+    }
 }
 
 // 3단계: 읽기 조정
