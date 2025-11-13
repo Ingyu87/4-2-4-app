@@ -138,33 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         hideLoading();
     });
     
-    // 보고서 버튼 상태 업데이트 함수
-    function updateReportButtonState() {
-        const reportBtn = document.getElementById("generate-report-button");
-        if (!reportBtn) return;
-        
-        const journey = currentUserJourney;
-        const allRequiredStepsCompleted = 
-            journey.steps?.['pre-read']?.note_v1 && 
-            journey.steps?.['during-read']?.v1 && 
-            journey.steps?.['adjustment']?.choice && 
-            (journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-3']?.v1);
-        
-        if (allRequiredStepsCompleted) {
-            reportBtn.disabled = false;
-            reportBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        } else {
-            reportBtn.disabled = true;
-            reportBtn.classList.add("opacity-50", "cursor-not-allowed");
-        }
-    }
-    
-    // 피드백 요약 화면이 표시될 때마다 보고서 버튼 상태 업데이트
-    const originalBuildFeedbackSummaryView = buildFeedbackSummaryView;
-    window.buildFeedbackSummaryView = function() {
-        originalBuildFeedbackSummaryView();
-        updateReportButtonState();
-    };
 
     // 종합 피드백 '모두 받기' 버튼
     document.getElementById("feedback-get-all-button").addEventListener("click", handleGetAllFeedback);
