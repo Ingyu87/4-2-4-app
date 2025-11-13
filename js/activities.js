@@ -253,10 +253,19 @@ export async function handleAdjustmentSubmit() {
     repopulateUiForResume('step-4-postread');
     saveStateToLocal('step-4-postread');
     
-    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-4-postread';
-    showStep(nextStep);
-    updateNavigationBar(nextStep);
-    if (isRevision) buildFeedbackSummaryView();
+    // 네비게이션 바 업데이트 (자동 체크 표시)
+    updateNavigationBar('step-3-adjustment');
+    
+    // 수정 모드가 아니면 다음 단계로 이동
+    if (!isRevision) {
+        showStep('step-4-postread');
+        updateNavigationBar('step-4-postread');
+    } else {
+        const nextStep = 'step-7-feedback-summary';
+        showStep(nextStep);
+        updateNavigationBar(nextStep);
+        buildFeedbackSummaryView();
+    }
 }
 
 // 4단계: 읽기 후
