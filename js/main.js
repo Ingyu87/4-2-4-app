@@ -8,22 +8,23 @@ import { buildReport, downloadReport } from './report.js';
 
 // 초기화
 function initializeApp() {
-    // 환경 변수에서 API 키가 설정되어 있으면 API 키 입력 필드 숨기기
+    // 환경 변수에서 API 키가 설정되어 있으면 API 키 입력 필드 완전히 숨기기
+    const apiKeyInputGroup = document.getElementById("api-key-input")?.parentElement;
     if (geminiApiKey && geminiApiKey.trim() !== "" && geminiApiKey !== '%GEMINI_API_KEY%') {
-        const apiKeyInputGroup = document.getElementById("api-key-input")?.parentElement;
         if (apiKeyInputGroup) {
             apiKeyInputGroup.style.display = 'none';
+            apiKeyInputGroup.classList.add('hidden');
         }
     } else if (!geminiApiKey || geminiApiKey.trim() === "") {
         const savedApiKey = localStorage.getItem('geminiApiKey');
         if (savedApiKey) {
-            geminiApiKey = savedApiKey;
+            setGeminiApiKey(savedApiKey);
         }
     }
     
     const savedNickname = localStorage.getItem('userNickname');
     if (savedNickname) {
-        userNickname = savedNickname;
+        setUserNickname(savedNickname);
         loadStateFromLocal();
     } else {
         showView("login-view");
@@ -46,6 +47,15 @@ function initAdjustmentRadios() {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
+    // 환경 변수에서 API 키 확인 및 입력 필드 숨기기 (DOM 로드 후 즉시 실행)
+    const apiKeyInputGroup = document.getElementById("api-key-input")?.parentElement;
+    if (geminiApiKey && geminiApiKey.trim() !== "" && geminiApiKey !== '%GEMINI_API_KEY%') {
+        if (apiKeyInputGroup) {
+            apiKeyInputGroup.style.display = 'none';
+            apiKeyInputGroup.classList.add('hidden');
+        }
+    }
+    
     initializeApp();
     initAdjustmentRadios(); 
 
