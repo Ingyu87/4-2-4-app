@@ -236,7 +236,7 @@ export async function getAIReportEvaluation(journey, articleType) {
 
     const stepsOrder = [
         { key: 'pre-read', title: '읽기 전', v1: journey.steps['pre-read']?.note_v1, v2: journey.steps['pre-read']?.note_v2, feedback: journey.steps['pre-read']?.feedback },
-        { key: 'during-read', title: '읽기 중', v1: journey.steps['during-read']?.v1, v2: journey.steps['during-read']?.v2, feedback: journey.steps['during-read']?.feedback },
+        { key: 'during-read', title: '읽기 중', v1: journey.steps['during-read']?.v1, v2: journey.steps['during-read']?.v2, feedback: journey.steps['during-read']?.feedback, questions: journey.steps['during-read']?.questions },
         { key: 'adjustment', title: '읽기 조정', v1: journey.steps['adjustment']?.solution_v1, v2: journey.steps['adjustment']?.solution_v2, feedback: journey.steps['adjustment']?.feedback, choice: journey.steps['adjustment']?.choice },
         { key: 'post-read-1', title: `읽기 후 1 (${journey.steps['post-read-1']?.title || ''})`, v1: journey.steps['post-read-1']?.v1, v2: journey.steps['post-read-1']?.v2, feedback: journey.steps['post-read-1']?.feedback },
         { key: 'post-read-2', title: `읽기 후 2 (${journey.steps['post-read-2']?.title || ''})`, v1: journey.steps['post-read-2']?.v1, v2: journey.steps['post-read-2']?.v2, feedback: journey.steps['post-read-2']?.feedback },
@@ -244,7 +244,18 @@ export async function getAIReportEvaluation(journey, articleType) {
     ];
 
     stepsOrder.forEach(step => {
-        if (step.choice === 'no') {
+        if (step.key === 'during-read' && step.questions) {
+            // 읽기 중 단계는 질문과 답을 구분하여 표시
+            journeySummary += `\n- ${step.title}:\n`;
+            step.questions.forEach((q, idx) => {
+                journeySummary += `  - 질문 ${idx + 1} (${q.type}): ${q.question}\n`;
+                journeySummary += `    답: ${q.answer || '답 없음'}\n`;
+            });
+            journeySummary += `  - AI 피드백: ${step.feedback || '받지 않음'}\n`;
+            if (step.v2) {
+                journeySummary += `  - 학생 수정 (v2): ${step.v2}\n`;
+            }
+        } else if (step.choice === 'no') {
             journeySummary += `\n- ${step.title}: "이해하기 어려운 부분 없음" 선택.\n`;
         } else if (step.v1) {
             journeySummary += `\n- ${step.title}:
