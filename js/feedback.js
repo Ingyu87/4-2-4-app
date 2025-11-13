@@ -1,4 +1,4 @@
-import { currentUserJourney, currentArticleData, feedbackQueue, isFeedbackRunning } from './config.js';
+import { currentUserJourney, currentArticleData, feedbackQueue, isFeedbackRunning, setFeedbackQueue, setIsFeedbackRunning } from './config.js';
 import { getAIFeedback } from './api.js';
 import { saveStateToLocal } from './storage.js';
 import { saveActivity } from './activities.js';
@@ -69,7 +69,7 @@ export async function handleGetAllFeedback() {
     feedbackBtn.disabled = true;
     feedbackBtn.innerHTML = `<div class="spinner !w-6 !h-6 inline-block mr-2"></div> 피드백 생성 중... (1/?)`;
 
-    feedbackQueue.length = 0;
+    const newFeedbackQueue = [];
     const journey = currentUserJourney;
     const stepsOrder = [
         { key: 'pre-read', v1: journey.steps['pre-read']?.note_v1, stage: 'pre-read' },
@@ -82,16 +82,18 @@ export async function handleGetAllFeedback() {
 
     stepsOrder.forEach(step => {
         if (step.v1 && !journey.steps[step.key].feedback && step.choice !== 'no') {
-            feedbackQueue.push(step);
+            newFeedbackQueue.push(step);
         }
     });
 
-    if (feedbackQueue.length === 0) {
+    setFeedbackQueue(newFeedbackQueue);
+
+    if (newFeedbackQueue.length === 0) {
         feedbackBtn.classList.add("hidden");
         return;
     }
 
-    isFeedbackRunning = true;
+    setIsFeedbackRunning(true);
     let totalJobs = feedbackQueue.length;
     let jobsDone = 0;
 
@@ -118,7 +120,7 @@ export async function handleGetAllFeedback() {
         }
     }
 
-    isFeedbackRunning = false;
+    setIsFeedbackRunning(false);
     feedbackBtn.classList.add("hidden");
     saveStateToLocal('step-7-feedback-summary');
 }

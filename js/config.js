@@ -41,3 +41,13 @@ export function setCurrentUserJourney(journey) {
     currentUserJourney = journey;
 }
 
+// Feedback Queue 설정 함수
+export function setFeedbackQueue(queue) {
+    feedbackQueue = queue;
+}
+
+// Feedback Running 상태 설정 함수
+export function setIsFeedbackRunning(running) {
+    isFeedbackRunning = running;
+}
+
