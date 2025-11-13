@@ -1,6 +1,6 @@
-import { currentArticleId, currentArticleData, currentUserJourney, userNickname } from './config.js';
+import { currentArticleId, currentArticleData, currentUserJourney, userNickname, setCurrentArticleId, setCurrentArticleData, setCurrentUserJourney } from './config.js';
 import { checkSafety } from './api.js';
-import { showModal, showLoading, hideLoading, repopulateUiForResume, showStep } from './ui.js';
+import { showModal, showLoading, hideLoading, repopulateUiForResume, showStep, showView } from './ui.js';
 import { saveStateToLocal } from './storage.js';
 import { buildFeedbackSummaryView } from './feedback.js';
 import { generateText } from './api.js';
@@ -245,16 +245,17 @@ export async function handleGenerateContent() {
         const textData = await generateText(type, topic);
 
         // 랜덤 ID 생성
-        currentArticleId = 'article_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const newArticleId = 'article_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        setCurrentArticleId(newArticleId);
 
-        Object.assign(currentArticleData, { 
+        setCurrentArticleData({ 
             ...textData, 
             type, 
             difficulty, 
-            id: currentArticleId 
+            id: newArticleId 
         });
 
-        Object.assign(currentUserJourney, {
+        setCurrentUserJourney({
             articleTitle: textData.title,
             articleBody: textData.body,
             articleType: type,

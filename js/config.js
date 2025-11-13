@@ -26,3 +26,18 @@ export function setUserNickname(nickname) {
     userNickname = nickname;
 }
 
+// Article ID 설정 함수
+export function setCurrentArticleId(id) {
+    currentArticleId = id;
+}
+
+// Article Data 설정 함수
+export function setCurrentArticleData(data) {
+    currentArticleData = data;
+}
+
+// User Journey 설정 함수
+export function setCurrentUserJourney(journey) {
+    currentUserJourney = journey;
+}
+
