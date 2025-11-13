@@ -83,11 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        showLoading("닉네임을 검토 중입니다...");
+        showLoading("번호를 검토 중입니다...");
         const safetyResult = await checkSafety(nickname);
         hideLoading();
         if (safetyResult !== "SAFE") {
-            showModal("부적절한 닉네임", `입력한 닉네임에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);
+            showModal("부적절한 내용", `입력한 번호에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);
             return;
         }
 
