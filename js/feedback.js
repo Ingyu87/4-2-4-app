@@ -32,18 +32,34 @@ export function buildFeedbackSummaryView() {
             `;
         } else if (step.v1) {
             const v1_text = step.v1.replace(/\n/g, '<br>');
-            const v2_html = step.v2 ? `<p class="report-revision"><b>수정한 내용 (v2):</b> ${step.v2.replace(/\n/g, '<br>')}</p>` : '';
-            const feedback_html = step.feedback 
-                ? `<p class="report-feedback"><b>🤖 AI 피드백:</b> ${step.feedback.replace(/\n/g, '<br>')}</p>`
-                : `<div id="feedback-placeholder-${step.key}" class="text-gray-500 text-sm italic">피드백을 기다리는 중...</div>`;
+            const v2_html = step.v2 ? `<div class="report-revision"><b>수정한 내용 (v2):</b> ${step.v2.replace(/\n/g, '<br>')}</div>` : '';
+            
+            // 피드백을 파싱하여 구조화된 형식으로 표시
+            let feedback_html = '';
+            if (step.feedback) {
+                const feedbackText = step.feedback.replace(/\n/g, '<br>');
+                // **평가:** 형식이 있으면 강조 표시
+                const formattedFeedback = feedbackText
+                    .replace(/\*\*평가:\*\*/g, '<div class="font-bold text-lg mb-2 text-blue-700">📝 평가:</div>')
+                    .replace(/\*\*활동 분석:\*\*/g, '<div class="font-bold text-base mt-4 mb-2 text-purple-700">🔍 활동 분석:</div>')
+                    .replace(/\*\*개선 제안:\*\*/g, '<div class="font-bold text-base mt-4 mb-2 text-green-700">💡 개선 제안:</div>')
+                    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                
+                feedback_html = `<div class="report-feedback">${formattedFeedback}</div>`;
+            } else {
+                feedback_html = `<div id="feedback-placeholder-${step.key}" class="text-gray-500 text-sm italic py-4">피드백을 기다리는 중...</div>`;
+            }
 
             html += `
-                <div class="bg-white p-5 rounded-2xl shadow-lg mb-6">
-                    <div class="flex justify-between items-center mb-2">
+                <div class="bg-white p-6 rounded-2xl shadow-lg mb-6 border-2 border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-gray-800">${step.title}</h3>
                         <button class="btn-edit-step px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 text-sm" data-edit-step="${step.editStep}" data-step-key="${step.stepKey}">수정하기</button>
                     </div>
-                    <p class="report-question"><b>내가 작성한 내용 (v1):</b> ${v1_text}</p>
+                    <div class="report-question mb-4">
+                        <div class="font-semibold text-gray-700 mb-2">내가 작성한 내용 (v1):</div>
+                        <div class="text-gray-800">${v1_text}</div>
+                    </div>
                     ${v2_html}
                     ${feedback_html}
                 </div>
@@ -138,10 +154,8 @@ export async function handleGetAllFeedback() {
             
             currentUserJourney.steps[job.key].feedback = feedback;
             
-            const placeholder = document.getElementById(`feedback-placeholder-${job.key}`);
-            if (placeholder) {
-                placeholder.outerHTML = `<p class="report-feedback"><b>🤖 AI 피드백:</b> ${feedback.replace(/\n/g, '<br>')}</p>`;
-            }
+            // 피드백이 업데이트되면 buildFeedbackSummaryView를 호출하여 전체 화면을 다시 렌더링
+            // placeholder는 buildFeedbackSummaryView에서 처리됨
 
         } catch (error) {
             console.error("AI 피드백 오류:", job.key, error);
