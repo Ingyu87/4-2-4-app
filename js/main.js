@@ -1,7 +1,7 @@
 import { geminiApiKey, setGeminiApiKey, userNickname, setUserNickname, currentUserJourney, currentArticleData, currentArticleId, setCurrentUserJourney, setCurrentArticleData, setCurrentArticleId } from './config.js';
 import { checkSafety } from './api.js';
 import { loadStateFromLocal, saveStateToLocal } from './storage.js';
-import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint } from './ui.js';
+import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint, updateNavigationBar } from './ui.js';
 import { handleGenerateContent, handlePreReadSubmit, handleDuringReadSubmit, handleAdjustmentSubmit, handlePostReadSubmit, addQuestionField } from './activities.js';
 import { buildFeedbackSummaryView, handleGetAllFeedback, handleEditStep } from './feedback.js';
 import { buildReport, downloadReport } from './report.js';
@@ -140,6 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
         showView("config-view");
     });
     
+    // 네비게이션 바 클릭 이벤트
+    document.addEventListener('click', (event) => {
+        const navStepBtn = event.target.closest('.nav-step-btn');
+        if (navStepBtn) {
+            const stepId = navStepBtn.dataset.step;
+            if (stepId) {
+                showStep(stepId);
+            }
+        }
+    });
+
     // 이벤트 위임
     document.addEventListener('click', (event) => {
         const viewArticleButton = event.target.closest('.btn-view-article');

@@ -43,6 +43,41 @@
     <!-- 메인 컨테이너 -->
     <div class="container mx-auto max-w-4xl p-4">
 
+        <!-- 네비게이션 바 (활동 뷰에서만 표시) -->
+        <div id="step-navigation" class="hidden mb-6 bg-white rounded-2xl shadow-lg p-4 border border-gray-200">
+            <div class="flex flex-wrap gap-2 md:gap-3 justify-center items-center">
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-1-preread">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>1️⃣ 읽기 전</span>
+                </button>
+                <div class="text-gray-300">→</div>
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-2-duringread">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>2️⃣ 읽기 중</span>
+                </button>
+                <div class="text-gray-300">→</div>
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-3-adjustment">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>🧑‍🏫 읽기 점검</span>
+                </button>
+                <div class="text-gray-300">→</div>
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-4-postread">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>3️⃣ 읽기 후</span>
+                </button>
+                <div class="text-gray-300">→</div>
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-7-feedback-summary">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>📝 피드백</span>
+                </button>
+                <div class="text-gray-300">→</div>
+                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-6-report">
+                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
+                    <span>📊 보고서</span>
+                </button>
+            </div>
+        </div>
+
         <!-- 1. 로그인 뷰 -->
         <div id="login-view" class="view flex items-center justify-center min-h-screen">
             <div class="w-full max-w-md text-center bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">

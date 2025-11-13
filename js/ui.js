@@ -23,6 +23,7 @@ export function showStep(stepId) {
         activeStep.classList.remove("hidden");
     }
     showView("activity-view");
+    updateNavigationBar(stepId);
 }
 
 // 모달 및 로딩 관리

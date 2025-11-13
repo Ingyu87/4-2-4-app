@@ -1,6 +1,6 @@
 import { currentArticleId, currentArticleData, currentUserJourney, userNickname, setCurrentArticleId, setCurrentArticleData, setCurrentUserJourney } from './config.js';
 import { checkSafety } from './api.js';
-import { showModal, showLoading, hideLoading, repopulateUiForResume, showStep, showView } from './ui.js';
+import { showModal, showLoading, hideLoading, repopulateUiForResume, showStep, showView, updateNavigationBar } from './ui.js';
 import { saveStateToLocal } from './storage.js';
 import { buildFeedbackSummaryView } from './feedback.js';
 import { generateText } from './api.js';
@@ -231,7 +231,9 @@ export async function handleAdjustmentSubmit() {
     repopulateUiForResume('step-4-postread');
     saveStateToLocal('step-4-postread');
     
-    showStep(isRevision ? 'step-7-feedback-summary' : 'step-4-postread');
+    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-4-postread';
+    showStep(nextStep);
+    updateNavigationBar(nextStep);
     if (isRevision) buildFeedbackSummaryView();
 }
 
