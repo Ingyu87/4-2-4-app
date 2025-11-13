@@ -3,7 +3,7 @@ import { checkSafety } from './api.js';
 import { loadStateFromLocal, saveStateToLocal } from './storage.js';
 import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint, updateNavigationBar } from './ui.js';
 import { handleGenerateContent, handlePreReadSubmit, handleDuringReadSubmit, handleAdjustmentSubmit, handlePostReadSubmit, addQuestionField } from './activities.js';
-import { buildFeedbackSummaryView, handleGetAllFeedback, handleEditStep } from './feedback.js';
+import { buildFeedbackSummaryView as originalBuildFeedbackSummaryView, handleGetAllFeedback, handleEditStep } from './feedback.js';
 import { buildReport, downloadReport } from './report.js';
 
 // 초기화
@@ -113,6 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 최종 보고서 생성 버튼
     document.getElementById("generate-report-button").addEventListener("click", async () => {
+        // 모든 필수 단계 완료 여부 확인
+        const journey = currentUserJourney;
+        const allRequiredStepsCompleted = 
+            journey.steps?.['pre-read']?.note_v1 && 
+            journey.steps?.['during-read']?.v1 && 
+            journey.steps?.['adjustment']?.choice && 
+            (journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-3']?.v1);
+        
+        if (!allRequiredStepsCompleted) {
+            showModal("알림", "모든 활동(읽기 전, 읽기 중, 읽기 점검, 읽기 후)을 완료한 후에 보고서를 생성할 수 있습니다.");
+            return;
+        }
+        
         showLoading("AI 선생님이 최종 보고서를 작성하는 중입니다...");
         try {
             await buildReport();
@@ -124,6 +137,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         hideLoading();
     });
+    
+    // 보고서 버튼 상태 업데이트 함수
+    function updateReportButtonState() {
+        const reportBtn = document.getElementById("generate-report-button");
+        if (!reportBtn) return;
+        
+        const journey = currentUserJourney;
+        const allRequiredStepsCompleted = 
+            journey.steps?.['pre-read']?.note_v1 && 
+            journey.steps?.['during-read']?.v1 && 
+            journey.steps?.['adjustment']?.choice && 
+            (journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-3']?.v1);
+        
+        if (allRequiredStepsCompleted) {
+            reportBtn.disabled = false;
+            reportBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        } else {
+            reportBtn.disabled = true;
+            reportBtn.classList.add("opacity-50", "cursor-not-allowed");
+        }
+    }
+    
+    // 피드백 요약 화면이 표시될 때마다 보고서 버튼 상태 업데이트
+    const originalBuildFeedbackSummaryView = buildFeedbackSummaryView;
+    window.buildFeedbackSummaryView = function() {
+        originalBuildFeedbackSummaryView();
+        updateReportButtonState();
+    };
 
     // 종합 피드백 '모두 받기' 버튼
     document.getElementById("feedback-get-all-button").addEventListener("click", handleGetAllFeedback);

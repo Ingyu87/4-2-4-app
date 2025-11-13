@@ -222,12 +222,23 @@ export function updateNavigationBar(currentStepId) {
         'step-6-report': false // 보고서는 별도로 확인
     };
     
+    // 필수 단계 완료 여부 확인 (피드백과 보고서 접근 제한)
+    const allRequiredStepsCompleted = 
+        stepStatus['step-1-preread'] && 
+        stepStatus['step-2-duringread'] && 
+        stepStatus['step-3-adjustment'] && 
+        stepStatus['step-4-postread'];
+    
     // 모든 네비게이션 버튼 업데이트
     document.querySelectorAll('.nav-step-btn').forEach(btn => {
         const stepId = btn.dataset.step;
         const checkIcon = btn.querySelector('.nav-step-check');
         const isCompleted = stepStatus[stepId] || false;
         const isActive = stepId === currentStepId;
+        
+        // 피드백과 보고서는 모든 필수 단계 완료 후에만 접근 가능
+        const isRestricted = (stepId === 'step-7-feedback-summary' || stepId === 'step-6-report');
+        const canAccess = !isRestricted || allRequiredStepsCompleted;
         
         // 체크 표시 업데이트
         if (isCompleted) {
@@ -237,13 +248,21 @@ export function updateNavigationBar(currentStepId) {
         }
         
         // 활성 상태 스타일 업데이트
-        btn.classList.remove("bg-amber-500", "text-white", "bg-gray-100", "text-gray-700", "bg-amber-100", "text-amber-700", "bg-green-50", "text-green-700", "border", "border-green-300");
+        btn.classList.remove("bg-amber-500", "text-white", "bg-gray-100", "text-gray-700", "bg-amber-100", "text-amber-700", "bg-green-50", "text-green-700", "border", "border-green-300", "opacity-50", "cursor-not-allowed");
         if (isActive) {
             btn.classList.add("bg-amber-500", "text-white");
         } else if (isCompleted) {
             btn.classList.add("bg-green-50", "text-green-700", "border", "border-green-300");
         } else {
             btn.classList.add("bg-gray-100", "text-gray-700");
+        }
+        
+        // 접근 제한 적용
+        if (!canAccess) {
+            btn.classList.add("opacity-50", "cursor-not-allowed");
+            btn.disabled = true;
+        } else {
+            btn.disabled = false;
         }
     });
 }

@@ -52,16 +52,29 @@ export function buildFeedbackSummaryView() {
     });
     container.innerHTML = html;
 
-    const feedbackBtn = document.getElementById("feedback-get-all-button");
-    const needsFeedback = stepsOrder.some(step => step.v1 && !step.feedback && step.choice !== 'no');
-    if (needsFeedback) {
-        feedbackBtn.classList.remove("hidden");
-        feedbackBtn.disabled = false;
-        feedbackBtn.innerHTML = "🤖 AI 피드백 한번에 받기";
-    } else {
-        feedbackBtn.classList.add("hidden");
-    }
-}
+            const feedbackBtn = document.getElementById("feedback-get-all-button");
+            const needsFeedback = stepsOrder.some(step => step.v1 && !step.feedback && step.choice !== 'no');
+            
+            // 모든 필수 단계 완료 여부 확인
+            const allRequiredStepsCompleted = 
+                journey.steps?.['pre-read']?.note_v1 && 
+                journey.steps?.['during-read']?.v1 && 
+                journey.steps?.['adjustment']?.choice && 
+                (journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-3']?.v1);
+            
+            if (needsFeedback && allRequiredStepsCompleted) {
+                feedbackBtn.classList.remove("hidden");
+                feedbackBtn.disabled = false;
+                feedbackBtn.innerHTML = "🤖 AI 피드백 한번에 받기";
+            } else if (!allRequiredStepsCompleted) {
+                feedbackBtn.classList.remove("hidden");
+                feedbackBtn.disabled = true;
+                feedbackBtn.innerHTML = "⚠️ 모든 활동을 완료한 후 피드백을 받을 수 있습니다";
+                feedbackBtn.classList.add("opacity-50", "cursor-not-allowed");
+            } else {
+                feedbackBtn.classList.add("hidden");
+            }
+        }
 
 // 모든 피드백 요청 처리
 export async function handleGetAllFeedback() {
