@@ -94,10 +94,10 @@ export async function handleGetAllFeedback() {
     }
 
     setIsFeedbackRunning(true);
-    let totalJobs = feedbackQueue.length;
+    let totalJobs = newFeedbackQueue.length;
     let jobsDone = 0;
 
-    for (const job of feedbackQueue) {
+    for (const job of newFeedbackQueue) {
         jobsDone++;
         feedbackBtn.innerHTML = `<div class="spinner !w-6 !h-6 inline-block mr-2"></div> 피드백 생성 중... (${jobsDone}/${totalJobs})`;
         
