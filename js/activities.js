@@ -44,7 +44,9 @@ export async function handlePreReadSubmit() {
     repopulateUiForResume('step-2-duringread');
     saveStateToLocal('step-2-duringread'); 
     
-    showStep(isRevision ? 'step-7-feedback-summary' : 'step-2-duringread');
+    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-2-duringread';
+    showStep(nextStep);
+    updateNavigationBar(nextStep);
     if (isRevision) buildFeedbackSummaryView(); 
 }
 
@@ -174,7 +176,9 @@ export async function handleDuringReadSubmit() {
     repopulateUiForResume('step-3-adjustment');
     saveStateToLocal('step-3-adjustment');
     
-    showStep(isRevision ? 'step-7-feedback-summary' : 'step-3-adjustment');
+    const nextStep = isRevision ? 'step-7-feedback-summary' : 'step-3-adjustment';
+    showStep(nextStep);
+    updateNavigationBar(nextStep);
     if (isRevision) buildFeedbackSummaryView();
 }
 
@@ -324,6 +328,7 @@ export async function handlePostReadSubmit() {
     saveStateToLocal('step-7-feedback-summary'); 
     buildFeedbackSummaryView(); 
     showStep('step-7-feedback-summary');
+    updateNavigationBar('step-7-feedback-summary');
 }
 
 // 글 생성 핸들러

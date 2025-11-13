@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await buildReport();
             showStep('step-6-report');
+            updateNavigationBar('step-6-report');
         } catch (error) {
             console.error("보고서 생성 오류:", error);
             showModal("오류", "최종 평가 보고서를 생성하는 데 실패했습니다.");
