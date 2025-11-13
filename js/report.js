@@ -43,7 +43,7 @@ export async function buildReport() {
         
         ${evaluationHtml}
 
-        <div class="report-section mt-12">
+        <div id="report-article-section" class="report-section mt-12">
             <h2 class="text-2xl font-bold mb-4">1. 내가 읽은 글</h2>
             <h3 class="text-xl font-bold mb-2">${journey.articleTitle}</h3>
             <div class="prose max-w-none bg-gray-50 p-5 rounded-2xl text-base">
@@ -51,7 +51,7 @@ export async function buildReport() {
             </div>
         </div>
 
-        <div class="report-section mt-12">
+        <div id="report-activities-section" class="report-section mt-12">
             <h2 class="text-2xl font-bold mb-6">2. 나의 읽기 활동 과정</h2>
     `;
 
@@ -178,25 +178,53 @@ export async function buildReport() {
     content.innerHTML = html;
 }
 
-// PNG로 보고서 다운로드
+// PNG로 보고서 다운로드 (전체)
 export async function downloadReport() {
     const reportElement = document.getElementById("report-content");
-    showLoading("보고서 이미지 생성 중... (조금 오래 걸릴 수 있어요)");
+    await downloadElementAsPNG(reportElement, `ai_writing_report_${userNickname}.png`, "전체 보고서 이미지 생성 중...");
+}
+
+// 글 내용만 PNG로 다운로드
+export async function downloadArticlePNG() {
+    const articleSection = document.getElementById("report-article-section");
+    if (!articleSection) {
+        showModal("오류", "글 내용 섹션을 찾을 수 없습니다.");
+        return;
+    }
+    await downloadElementAsPNG(articleSection, `ai_writing_article_${userNickname}.png`, "글 내용 이미지 생성 중...");
+}
+
+// 활동 과정만 PNG로 다운로드
+export async function downloadActivitiesPNG() {
+    const activitiesSection = document.getElementById("report-activities-section");
+    if (!activitiesSection) {
+        showModal("오류", "활동 과정 섹션을 찾을 수 없습니다.");
+        return;
+    }
+    await downloadElementAsPNG(activitiesSection, `ai_writing_activities_${userNickname}.png`, "활동 과정 이미지 생성 중...");
+}
+
+// 공통 PNG 다운로드 함수
+async function downloadElementAsPNG(element, filename, loadingMessage) {
+    showLoading(loadingMessage + " (조금 오래 걸릴 수 있어요)");
     
     try {
-        // 스크롤을 맨 위로 이동하여 전체 보고서가 보이도록 함
+        // 스크롤을 맨 위로 이동
+        window.scrollTo(0, 0);
         const activityView = document.getElementById("activity-view");
         if (activityView && activityView.parentElement) {
             activityView.parentElement.scrollTop = 0;
         }
-        window.scrollTo(0, 0);
         
-        // 보고서 요소의 전체 높이와 너비 계산
-        const elementHeight = reportElement.scrollHeight;
-        const elementWidth = reportElement.scrollWidth;
+        // 요소가 보이도록 스크롤
+        element.scrollIntoView({ behavior: 'instant', block: 'start' });
         
-        // html2canvas로 전체 보고서 캡처 (전체 높이와 너비 명시)
-        const canvas = await html2canvas(reportElement, {
+        // 요소의 전체 높이와 너비 계산
+        const elementHeight = element.scrollHeight;
+        const elementWidth = element.scrollWidth;
+        
+        // html2canvas로 요소 캡처
+        const canvas = await html2canvas(element, {
             scale: 1.5,
             useCORS: true,
             backgroundColor: '#ffffff',
@@ -211,13 +239,13 @@ export async function downloadReport() {
         });
         
         const link = document.createElement('a');
-        link.download = `ai_writing_report_${userNickname}.png`;
+        link.download = filename;
         link.href = canvas.toDataURL('image/png');
         link.click();
 
     } catch (err) {
-        console.error("Report download failed", err);
-        showModal("오류", "보고서 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        console.error("PNG download failed", err);
+        showModal("오류", "이미지 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
     hideLoading();
 }
