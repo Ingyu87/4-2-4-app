@@ -16,3 +16,13 @@ export let geminiApiKey = typeof __gemini_api_key !== 'undefined'
             ? window.__gemini_api_key
             : (typeof window !== 'undefined' && localStorage.getItem('geminiApiKey') || "")));
 
+// API 키 설정 함수
+export function setGeminiApiKey(key) {
+    geminiApiKey = key;
+}
+
+// 사용자 닉네임 설정 함수
+export function setUserNickname(nickname) {
+    userNickname = nickname;
+}
+

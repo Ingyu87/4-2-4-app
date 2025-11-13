@@ -1,4 +1,4 @@
-import { geminiApiKey, userNickname, currentUserJourney, currentArticleData, currentArticleId } from './config.js';
+import { geminiApiKey, setGeminiApiKey, userNickname, setUserNickname, currentUserJourney, currentArticleData, currentArticleId } from './config.js';
 import { checkSafety } from './api.js';
 import { loadStateFromLocal, saveStateToLocal } from './storage.js';
 import { showView, showStep, showLoading, hideLoading, showModal, closeModal, showHint } from './ui.js';
@@ -8,7 +8,13 @@ import { buildReport, downloadReport } from './report.js';
 
 // 초기화
 function initializeApp() {
-    if (!geminiApiKey || geminiApiKey.trim() === "") {
+    // 환경 변수에서 API 키가 설정되어 있으면 API 키 입력 필드 숨기기
+    if (geminiApiKey && geminiApiKey.trim() !== "" && geminiApiKey !== '%GEMINI_API_KEY%') {
+        const apiKeyInputGroup = document.getElementById("api-key-input")?.parentElement;
+        if (apiKeyInputGroup) {
+            apiKeyInputGroup.style.display = 'none';
+        }
+    } else if (!geminiApiKey || geminiApiKey.trim() === "") {
         const savedApiKey = localStorage.getItem('geminiApiKey');
         if (savedApiKey) {
             geminiApiKey = savedApiKey;
@@ -48,12 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const apiKeyInput = document.getElementById("api-key-input").value.trim();
         const nickname = document.getElementById("nickname-input").value;
         
-        if (apiKeyInput) {
-            geminiApiKey = apiKeyInput;
+        // 환경 변수에서 API 키가 없을 때만 입력값 사용
+        let finalApiKey = geminiApiKey;
+        if (apiKeyInput && (!geminiApiKey || geminiApiKey.trim() === "" || geminiApiKey === '%GEMINI_API_KEY%')) {
+            finalApiKey = apiKeyInput;
+            setGeminiApiKey(apiKeyInput);
             localStorage.setItem('geminiApiKey', apiKeyInput);
         }
         
-        if (!geminiApiKey || geminiApiKey.trim() === "") {
+        // 환경 변수에서도 API 키가 없고, 입력값도 없으면 에러
+        if (!finalApiKey || finalApiKey.trim() === "" || finalApiKey === '%GEMINI_API_KEY%') {
             showModal("API 키 필요", "Gemini API 키를 입력해주세요. API 키는 Google AI Studio(https://aistudio.google.com)에서 발급받을 수 있습니다.");
             return;
         }
@@ -71,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        userNickname = nickname;
+        setUserNickname(nickname);
         localStorage.setItem('userNickname', nickname);
         loadStateFromLocal();
     });
