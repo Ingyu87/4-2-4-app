@@ -38,9 +38,9 @@ export function buildFeedbackSummaryView() {
             let feedback_html = '';
             if (step.feedback) {
                 const feedbackText = step.feedback.replace(/\n/g, '<br>');
-                // **평가:** 형식이 있으면 강조 표시
+                // **활동 분석:**와 **개선 제안:** 형식만 강조 표시 (평가 섹션 제거)
                 const formattedFeedback = feedbackText
-                    .replace(/\*\*평가:\*\*/g, '<div class="font-bold text-lg mb-2 text-blue-700">📝 평가:</div>')
+                    .replace(/\*\*평가:\*\*/g, '') // 평가 섹션 제거
                     .replace(/\*\*활동 분석:\*\*/g, '<div class="font-bold text-base mt-4 mb-2 text-purple-700">🔍 활동 분석:</div>')
                     .replace(/\*\*개선 제안:\*\*/g, '<div class="font-bold text-base mt-4 mb-2 text-green-700">💡 개선 제안:</div>')
                     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
