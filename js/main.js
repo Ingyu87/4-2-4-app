@@ -144,7 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 이벤트 위임
     document.addEventListener('click', (event) => {
         const viewArticleButton = event.target.closest('.btn-view-article');
-        if (viewArticleButton) {
+        const viewArticleInEditButton = event.target.closest('.btn-view-article-in-edit');
+        
+        if (viewArticleButton || viewArticleInEditButton) {
             if (currentArticleData && currentArticleData.body) {
                 const articleHtml = currentArticleData.body.split('\n\n').map(p => `<p>${p}</p>`).join('');
                 showModal(

@@ -145,6 +145,11 @@ export function handleEditStep(stepId, stepKey) {
             : "예) 아마 글쓴이는 ...라고 주장할 것 같다. 이 주제에 대해 나도 ...한 경험이 있다.";
         
         modalBody = `
+            <div class="mb-4">
+                <button class="btn-view-article-in-edit w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm">
+                    📖 글 다시 보기
+                </button>
+            </div>
             <label class="block text-lg font-semibold text-gray-800 mb-2">${label}</label>
             <textarea id="edit-preread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="${placeholder}">${currentValue}</textarea>
         `;
@@ -159,6 +164,11 @@ export function handleEditStep(stepId, stepKey) {
             : "예) 글쓴이의 주장은 ...인데, 그 이유는 타당할까? / 나라면 ...라고 주장하겠다.";
         
         modalBody = `
+            <div class="mb-4">
+                <button class="btn-view-article-in-edit w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm">
+                    📖 글 다시 보기
+                </button>
+            </div>
             <label class="block text-lg font-semibold text-gray-800 mb-2">${label}</label>
             <textarea id="edit-duringread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="${placeholder}">${currentValue}</textarea>
         `;
@@ -168,6 +178,11 @@ export function handleEditStep(stepId, stepKey) {
         const currentSolution = journey.steps['adjustment']?.solution_v2 || journey.steps['adjustment']?.solution_v1 || '';
         
         modalBody = `
+            <div class="mb-4">
+                <button class="btn-view-article-in-edit w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm">
+                    📖 글 다시 보기
+                </button>
+            </div>
             <p class="text-lg font-semibold text-gray-800 mb-3">글을 읽다가 내용이 이해되지 않거나<br>막히는 부분이 있었나요?</p>
             <div class="flex space-x-4 mb-4">
                 <label class="flex items-center p-4 rounded-xl border-2 ${currentChoice === 'no' ? 'border-amber-400' : 'border-gray-200'} flex-1 hover:border-amber-400 transition">
@@ -214,6 +229,11 @@ export function handleEditStep(stepId, stepKey) {
         }
         
         modalBody = `
+            <div class="mb-4">
+                <button class="btn-view-article-in-edit w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 text-sm">
+                    📖 글 다시 보기
+                </button>
+            </div>
             <label class="block text-lg font-semibold text-gray-800 mb-2">${label}</label>
             <textarea id="edit-postread-question-${postReadNum}" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="${placeholder}">${currentValue}</textarea>
         `;
