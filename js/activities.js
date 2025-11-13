@@ -47,9 +47,10 @@ export async function handlePreReadSubmit() {
     // 네비게이션 바 업데이트 (자동 체크 표시)
     updateNavigationBar('step-1-preread');
     
-    // 수정 모드가 아니면 현재 단계에 머물기
+    // 수정 모드가 아니면 다음 단계로 이동
     if (!isRevision) {
-        showStep('step-1-preread');
+        showStep('step-2-duringread');
+        updateNavigationBar('step-2-duringread');
     } else {
         const nextStep = 'step-7-feedback-summary';
         showStep(nextStep);
@@ -187,9 +188,10 @@ export async function handleDuringReadSubmit() {
     // 네비게이션 바 업데이트 (자동 체크 표시)
     updateNavigationBar('step-2-duringread');
     
-    // 수정 모드가 아니면 현재 단계에 머물기
+    // 수정 모드가 아니면 다음 단계로 이동
     if (!isRevision) {
-        showStep('step-2-duringread');
+        showStep('step-3-adjustment');
+        updateNavigationBar('step-3-adjustment');
     } else {
         const nextStep = 'step-7-feedback-summary';
         showStep(nextStep);
