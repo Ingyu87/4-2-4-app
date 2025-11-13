@@ -215,15 +215,85 @@ export function handleEditStep(stepId, stepKey) {
         `;
     } else if (stepKey === 'during-read') {
         modalTitle = "2️⃣ 읽기 중 수정";
-        const currentValue = journey.steps['during-read']?.v2 || journey.steps['during-read']?.v1 || '';
         const label = article.type === '설명하는 글'
             ? "글을 읽으며 중심 내용이나 새롭게 알게 된 사실에 대해 질문을 만들어 보세요."
             : "글을 읽으며 글쓴이의 의견이나 그 이유가 적절한지 질문을 만들어 보세요.";
-        const placeholder = article.type === '설명하는 글'
-            ? "예) 이 문단에서 가장 중요한 내용은 무엇일까? / ...은 왜 ...일까?"
-            : "예) 글쓴이의 주장은 ...인데, 그 이유는 타당할까? / 나라면 ...라고 주장하겠다.";
         
         const articleBody = article.body ? article.body.split('\n\n').map(p => `<p>${p}</p>`).join('') : '';
+        
+        // 저장된 질문들을 HTML로 생성
+        let questionsHtml = '';
+        const savedQuestions = journey.steps['during-read']?.questions || [];
+        savedQuestions.forEach((q, idx) => {
+            const questionId = `edit-question-${idx}`;
+            const questionTypes = article.type === '설명하는 글'
+                ? [
+                    { value: 'center', label: '중심 내용 찾기' },
+                    { value: 'new', label: '새롭게 알게 된 사실' },
+                    { value: 'detail', label: '세부 내용 파악' },
+                    { value: 'why', label: '이유/원인 찾기' },
+                    { value: 'other', label: '기타' }
+                ]
+                : [
+                    { value: 'opinion', label: '글쓴이의 의견' },
+                    { value: 'reason', label: '이유의 타당성' },
+                    { value: 'compare', label: '자신의 생각과 비교' },
+                    { value: 'critique', label: '비판적 사고' },
+                    { value: 'other', label: '기타' }
+                ];
+            
+            questionsHtml += `
+                <div class="question-item bg-gray-50 p-4 rounded-xl border-2 border-gray-200" data-question-id="${questionId}">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-700">질문 종류</label>
+                        <button class="remove-question text-red-500 hover:text-red-700 text-sm font-semibold" data-question-id="${questionId}">삭제</button>
+                    </div>
+                    <select class="question-type w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" data-question-id="${questionId}">
+                        ${questionTypes.map(type => `<option value="${type.value}" ${q.type === type.value ? 'selected' : ''}>${type.label}</option>`).join('')}
+                    </select>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">질문</label>
+                    <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요" data-question-id="${questionId}">${q.question || ''}</textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">답</label>
+                    <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요" data-question-id="${questionId}">${q.answer || ''}</textarea>
+                </div>
+            `;
+        });
+        
+        // 질문이 없으면 기본 질문 하나 추가
+        if (questionsHtml === '') {
+            const questionId = `edit-question-0`;
+            const questionTypes = article.type === '설명하는 글'
+                ? [
+                    { value: 'center', label: '중심 내용 찾기' },
+                    { value: 'new', label: '새롭게 알게 된 사실' },
+                    { value: 'detail', label: '세부 내용 파악' },
+                    { value: 'why', label: '이유/원인 찾기' },
+                    { value: 'other', label: '기타' }
+                ]
+                : [
+                    { value: 'opinion', label: '글쓴이의 의견' },
+                    { value: 'reason', label: '이유의 타당성' },
+                    { value: 'compare', label: '자신의 생각과 비교' },
+                    { value: 'critique', label: '비판적 사고' },
+                    { value: 'other', label: '기타' }
+                ];
+            
+            questionsHtml = `
+                <div class="question-item bg-gray-50 p-4 rounded-xl border-2 border-gray-200" data-question-id="${questionId}">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-700">질문 종류</label>
+                        <button class="remove-question text-red-500 hover:text-red-700 text-sm font-semibold" data-question-id="${questionId}">삭제</button>
+                    </div>
+                    <select class="question-type w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" data-question-id="${questionId}">
+                        ${questionTypes.map(type => `<option value="${type.value}">${type.label}</option>`).join('')}
+                    </select>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">질문</label>
+                    <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요" data-question-id="${questionId}"></textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">답</label>
+                    <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요" data-question-id="${questionId}"></textarea>
+                </div>
+            `;
+        }
         
         modalBody = `
             <div class="mb-4">
@@ -237,7 +307,12 @@ export function handleEditStep(stepId, stepKey) {
                 </div>
             </div>
             <label class="block text-lg font-semibold text-gray-800 mb-2">${label}</label>
-            <textarea id="edit-duringread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="${placeholder}">${currentValue}</textarea>
+            <div id="edit-duringread-questions-container" class="space-y-4 mb-4">
+                ${questionsHtml}
+            </div>
+            <button id="edit-duringread-add-question" class="w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 mb-4">
+                + 질문 추가하기
+            </button>
         `;
     } else if (stepKey === 'adjustment') {
         modalTitle = "🧑‍🏫 읽기 과정 점검 수정";
@@ -310,7 +385,7 @@ export function handleEditStep(stepId, stepKey) {
     document.getElementById("edit-modal-body").innerHTML = modalBody;
     document.getElementById("edit-modal").classList.remove("hidden");
     
-    // 읽기 중 수정 모달에서 글 보기 토글 기능
+    // 읽기 중 수정 모달에서 글 보기 토글 기능 및 질문 추가 기능
     if (stepKey === 'during-read') {
         const toggleBtn = document.getElementById("toggle-article-in-edit");
         const articleContent = document.getElementById("article-content-in-edit");
@@ -323,6 +398,72 @@ export function handleEditStep(stepId, stepKey) {
                 } else {
                     articleContent.classList.add('hidden');
                     toggleBtn.querySelector('span:last-child').textContent = '▼';
+                }
+            });
+        }
+        
+        // 질문 추가 버튼 이벤트 리스너
+        const addQuestionBtn = document.getElementById("edit-duringread-add-question");
+        if (addQuestionBtn) {
+            addQuestionBtn.addEventListener('click', () => {
+                const editQuestionsContainer = document.getElementById("edit-duringread-questions-container");
+                if (!editQuestionsContainer) {
+                    console.error("수정 모달 내 질문 컨테이너를 찾을 수 없습니다.");
+                    return;
+                }
+                const questionId = `edit-question-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+                const questionTypes = article.type === '설명하는 글'
+                    ? [
+                        { value: 'center', label: '중심 내용 찾기' },
+                        { value: 'new', label: '새롭게 알게 된 사실' },
+                        { value: 'detail', label: '세부 내용 파악' },
+                        { value: 'why', label: '이유/원인 찾기' },
+                        { value: 'other', label: '기타' }
+                    ]
+                    : [
+                        { value: 'opinion', label: '글쓴이의 의견' },
+                        { value: 'reason', label: '이유의 타당성' },
+                        { value: 'compare', label: '자신의 생각과 비교' },
+                        { value: 'critique', label: '비판적 사고' },
+                        { value: 'other', label: '기타' }
+                    ];
+                
+                const newQuestionHtml = `
+                    <div class="question-item bg-gray-50 p-4 rounded-xl border-2 border-gray-200" data-question-id="${questionId}">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-semibold text-gray-700">질문 종류</label>
+                            <button class="remove-question text-red-500 hover:text-red-700 text-sm font-semibold" data-question-id="${questionId}">삭제</button>
+                        </div>
+                        <select class="question-type w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" data-question-id="${questionId}">
+                            ${questionTypes.map(type => `<option value="${type.value}">${type.label}</option>`).join('')}
+                        </select>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">질문</label>
+                        <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요" data-question-id="${questionId}"></textarea>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">답</label>
+                        <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요" data-question-id="${questionId}"></textarea>
+                    </div>
+                `;
+                editQuestionsContainer.insertAdjacentHTML('beforeend', newQuestionHtml);
+
+                // 새로 추가된 삭제 버튼에 이벤트 리스너 연결
+                const newRemoveBtn = editQuestionsContainer.querySelector(`.remove-question[data-question-id="${questionId}"]`);
+                if (newRemoveBtn) {
+                    newRemoveBtn.addEventListener('click', () => {
+                        const item = editQuestionsContainer.querySelector(`.question-item[data-question-id="${questionId}"]`);
+                        if (item) item.remove();
+                    });
+                }
+            });
+        }
+        
+        // 기존 질문 삭제 버튼 이벤트 리스너
+        const editQuestionsContainer = document.getElementById("edit-duringread-questions-container");
+        if (editQuestionsContainer) {
+            editQuestionsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-question')) {
+                    const questionId = e.target.dataset.questionId;
+                    const item = editQuestionsContainer.querySelector(`.question-item[data-question-id="${questionId}"]`);
+                    if (item) item.remove();
                 }
             });
         }
