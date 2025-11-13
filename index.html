@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 글쓰기 교실</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas (PNG 보고서 생성용) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- CSS 파일 -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- JavaScript 모듈 -->
+    <script type="module" src="js/main.js"></script>
+</head>
+<body class="text-gray-800 bg-gradient-to-br from-yellow-50 via-white to-white">
+
+    <!-- 메인 컨테이너 -->
+    <div class="container mx-auto max-w-4xl p-4">
+
+        <!-- 1. 로그인 뷰 -->
+        <div id="login-view" class="view flex items-center justify-center min-h-screen">
+            <div class="w-full max-w-md text-center bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+                <span class="text-5xl mb-4 block">👋</span>
+                <h1 class="text-3xl font-bold text-gray-800 mb-3">AI 글쓰기 교실</h1>
+                <p class="text-gray-600 mb-8">AI가 만들어주는 새로운 이야기로 글쓰기를 시작해봐요!</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="api-key-input" class="block text-left text-sm font-semibold text-gray-600 mb-1">Gemini API 키 <span class="text-xs text-gray-400">(일반 웹 환경에서 필요)</span></label>
+                        <input type="password" id="api-key-input" placeholder="API 키를 입력하세요 (Gemini Canvas에서는 자동 설정됨)" class="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-amber-400 text-lg">
+                        <p class="text-xs text-gray-500 mt-1">API 키는 localStorage에 저장됩니다. Gemini Canvas 환경에서는 자동으로 설정됩니다.</p>
+                    </div>
+                    <div>
+                        <label for="nickname-input" class="block text-left text-sm font-semibold text-gray-600 mb-1">닉네임</label>
+                        <input type="text" id="nickname-input" placeholder="닉네임 (예: 2번 홍길동)" class="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-amber-400 text-lg">
+                    </div>
+                    <button id="login-button" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg">활동 시작!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 글 설정 뷰 -->
+        <div id="config-view" class="view hidden">
+            <div class="my-12 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">어떤 글을 읽어볼까요?</h1>
+                <div class="space-y-6">
+                    <div>
+                        <label for="article-type" class="block text-lg font-semibold text-gray-800 mb-2">1. 글의 종류</label>
+                        <select id="article-type" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base appearance-none">
+                            <option value="설명하는 글">설명하는 글 (사실/정보 📝)</option>
+                            <option value="의견을 제시하는 글">의견을 제시하는 글 (주장/이유 🤔)</option>
+                        </select>
+                    </div>
+                    <div class="hidden">
+                        <label for="article-difficulty" class="block text-lg font-semibold text-gray-800 mb-2">2. 난이도</label>
+                        <select id="article-difficulty" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base appearance-none">
+                            <option value="하">하 (쉬워요 🐣)</option>
+                            <option value="중">중 (적당해요 👍)</option>
+                            <option value="상" selected>상 (어려워요 🧠)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="article-topic" class="block text-lg font-semibold text-gray-800 mb-2">2. 주제 (선택)</label>
+                        <input type="text" id="article-topic" class="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-amber-400 text-lg" placeholder="예) 우주, 바다, AI (비워두면 AI가 추천)">
+                    </div>
+                    
+                    <button id="generate-button" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 11-8.486-4.95M19.071 16.071a5 5 0 01-4.95 8.486m-4.95-8.486l.99 1.714" />
+                        </svg>
+                        AI로 새 글 만들기
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- 3. 활동 뷰 (단계별) -->
+        <div id="activity-view" class="view hidden">
+            <div class="my-12 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+
+                <!-- 3-1. 읽기 전 단계 -->
+                <div id="step-1-preread" class="step-view">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="inline-block bg-amber-100 text-amber-700 text-base font-semibold px-4 py-1 rounded-full">1️⃣ 읽기 전</span>
+                    </div>
+                    <h2 id="preread-title" class="text-2xl font-bold mb-4">...</h2>
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <label id="preread-label" for="preread-question" class="block text-lg font-semibold text-gray-800">제목을 보고 예상되는 내용이나 배경지식을 적어보세요.</label>
+                        <button id="preread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm flex-shrink-0 ml-4">힌트 💡</button>
+                    </div>
+                    <textarea id="preread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="예) 이 글은 ...에 대해 설명하는 글일 것 같다."></textarea>
+                    <button id="preread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 !py-3 text-lg">다음 (읽기 중)</button>
+                </div>
+
+                <!-- 3-2. 읽기 중 단계 -->
+                <div id="step-2-duringread" class="step-view hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="inline-block bg-amber-100 text-amber-700 text-base font-semibold px-4 py-1 rounded-full">2️⃣ 읽기 중</span>
+                    </div>
+                    <h2 id="duringread-title" class="text-2xl font-bold mb-4">...</h2>
+                    <div id="duringread-body" class="prose max-w-none bg-gray-50 p-5 rounded-2xl mb-6 text-lg leading-relaxed">
+                        <!-- 본문 내용이 여기에 삽입됩니다. -->
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <label id="duringread-label" for="duringread-question" class="block text-lg font-semibold text-gray-800">글을 읽으며 궁금한 점이나 핵심 내용에 대해 질문을 만들어 보세요.</label>
+                        <button id="duringread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm flex-shrink-0 ml-4">힌트 💡</button>
+                    </div>
+                    <textarea id="duringread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="예) 이 문단에서 가장 중요한 내용은 무엇일까?"></textarea>
+                    <button id="duringread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 !py-3 text-lg">다음 (읽기 점검)</button>
+                </div>
+
+                <!-- 3-3. 읽기 조정 단계 -->
+                <div id="step-3-adjustment" class="step-view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="inline-block bg-amber-100 text-amber-700 text-base font-semibold px-4 py-1 rounded-full">🧑‍🏫 읽기 과정 점검</span>
+                        <button class="btn-view-article px-4 py-2 bg-sky-100 text-sky-700 font-semibold rounded-full hover:bg-sky-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm flex-shrink-0 ml-4">글 다시보기 📖</button>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-lg font-semibold text-gray-800 mb-3">글을 읽다가 내용이 이해되지 않거나<br>막히는 부분이 있었나요?</p>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
+                                    <input type="radio" name="adjustment-choice" value="no" class="h-5 w-5 text-amber-600" checked>
+                                    <span class="ml-3 text-lg">아니요, 없었어요.</span>
+                                </label>
+                                <label class="flex items-center p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
+                                    <input type="radio" name="adjustment-choice" value="yes" class="h-5 w-5 text-amber-600">
+                                    <span class="ml-3 text-lg">네, 있었어요.</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="adjustment-solution-group" class="hidden">
+                            <label for="adjustment-solution" class="block text-lg font-semibold text-gray-800 mb-2">어떻게 해결했는지 알려주세요!</label>
+                            <textarea id="adjustment-solution" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="예) 낱말의 뜻을 짐작해 보았어요. / 앞 문장을 다시 천천히 읽어보았어요."></textarea>
+                        </div>
+                        <button id="adjustment-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-4 !py-3 text-lg">다음 (읽기 후)</button>
+                    </div>
+                </div>
+
+                <!-- 3-4. 읽기 후 단계 -->
+                <div id="step-4-postread" class="step-view hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="inline-block bg-amber-100 text-amber-700 text-base font-semibold px-4 py-1 rounded-full">3️⃣ 읽기 후</span>
+                        <div class="flex gap-2">
+                            <button class="btn-view-article px-4 py-2 bg-sky-100 text-sky-700 font-semibold rounded-full hover:bg-sky-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm">글 다시보기 📖</button>
+                            <button id="postread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm">힌트 💡</button>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label id="postread-label-1" for="postread-question-1" class="block text-lg font-semibold text-gray-800 mb-2">글 전체의 내용을 요약하여 정리해보세요.</label>
+                            <textarea id="postread-question-1" rows="4" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="글의 중심 내용을 요약해 보세요."></textarea>
+                        </div>
+                        <div>
+                            <label id="postread-label-2" for="postread-question-2" class="block text-lg font-semibold text-gray-800 mb-2">글을 읽고 더 궁금해진 점은 무엇인가요?</label>
+                            <textarea id="postread-question-2" rows="4" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="더 알고 싶은 내용을 질문으로 만들어 보세요."></textarea>
+                        </div>
+                        <div id="postread-group-3" class="hidden">
+                            <label id="postread-label-3" for="postread-question-3" class="block text-lg font-semibold text-gray-800 mb-2">글에 대한 나의 생각이나 의견은 무엇인가요?</label>
+                            <textarea id="postread-question-3" rows="4" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="글쓴이의 의견과 내 생각을 비교해 보세요."></textarea>
+                        </div>
+                    </div>
+                    <button id="postread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 !py-3 text-lg">제출하고 피드백 받기</button>
+                </div>
+
+
+                <!-- 3-6. 활동 보고서 단계 -->
+                <div id="step-6-report" class="step-view hidden">
+                    <h2 class="text-3xl font-bold text-center mb-8">🎉 활동 완료! 보고서가 생성되었습니다.</h2>
+                    <button id="download-report-button" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        보고서 PNG로 다운로드
+                    </button>
+                    <div id="report-content" class="border border-gray-200 rounded-2xl overflow-hidden">
+                        <!-- JS로 내용이 채워집니다 -->
+                    </div>
+                    <button id="restart-button-report" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-8 !py-3 text-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2a8.001 8.001 0 0015.357 2m0 0H15" />
+                        </svg>
+                        새로운 글로 활동하기
+                    </button>
+                </div>
+                
+                <!-- 3-7. 종합 피드백 단계 -->
+                <div id="step-7-feedback-summary" class="step-view hidden">
+                    <h2 class="text-3xl font-bold text-center mb-4">✨ 활동 완료 및 종합 피드백</h2>
+                    <p class="text-center text-gray-600 mb-8">모든 활동을 완료했습니다! 아래에서 AI 피드백을 받고 활동을 수정해 보세요.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <button id="feedback-get-all-button" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95">
+                            🤖 AI 피드백 한번에 받기
+                        </button>
+                    </div>
+
+                    <!-- 피드백 내용이 여기에 동적으로 삽입됩니다. -->
+                    <div id="feedback-summary-container" class="space-y-6">
+                        <!-- JS (buildFeedbackSummaryView)로 내용이 채워집니다 -->
+                    </div>
+
+                    <button id="generate-report-button" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg mt-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        최종 보고서 생성하기
+                    </button>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- 4. 로딩 오버레이 -->
+        <div id="loading-view" class="hidden fixed inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
+            <div class="spinner"></div>
+            <p id="loading-message" class="text-lg font-semibold text-amber-700 mt-4">로딩 중...</p>
+        </div>
+
+        <!-- 5. 공용 모달 -->
+        <div id="modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black opacity-50"></div>
+            <div class="bg-white w-full max-w-md p-6 rounded-3xl shadow-xl z-50">
+                <h3 id="modal-title" class="text-xl font-bold text-amber-600 mb-4">...</h3>
+                <div id="modal-body" class="text-gray-700 mb-6 space-y-2">
+                    ...
+                </div>
+                <button class="btn-close-modal w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-2 !text-base">확인</button>
+            </div>
+        </div>
+
+        <!-- 6. 단계별 수정 모달 -->
+        <div id="edit-modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black opacity-50 edit-modal-backdrop"></div>
+            <div class="bg-white w-full max-w-2xl p-6 md:p-8 rounded-3xl shadow-xl z-50 max-h-[90vh] overflow-y-auto">
+                <h3 id="edit-modal-title" class="text-xl font-bold text-amber-600 mb-4">수정하기</h3>
+                <div id="edit-modal-body" class="text-gray-700 mb-6 space-y-4">
+                    <!-- 동적으로 채워짐 -->
+                </div>
+                <div class="flex gap-4">
+                    <button id="edit-modal-cancel" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-full shadow-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-base">취소</button>
+                    <button id="edit-modal-save" class="flex-1 px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-base">저장</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

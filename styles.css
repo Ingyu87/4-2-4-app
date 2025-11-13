@@ -1,0 +1,56 @@
+body {
+    font-family: 'Inter', 'Pretendard', sans-serif;
+}
+.view {
+    width: 100%;
+    min-height: 100vh;
+}
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #f59e0b; /* amber-500 */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+select.input-field-box {
+    @apply appearance-none;
+}
+#modal {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 보고서용 스타일 */
+#report-content, #feedback-summary-container {
+    @apply p-6 md:p-10 bg-white;
+}
+.report-section {
+    @apply border-t-2 border-gray-100 pt-8;
+}
+.report-question {
+    @apply bg-gray-50 p-4 rounded-lg mb-3 text-gray-700;
+}
+.report-feedback {
+    @apply bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg mb-3 text-amber-800;
+}
+.report-revision {
+    @apply bg-green-50 border-l-4 border-green-400 p-4 rounded-lg text-green-800;
+}
+#report-content .prose ul { @apply list-disc pl-5; }
+#report-content .prose p { @apply mb-2; }
+#report-content .prose strong { @apply font-bold; }
+/* 보고서 표 스타일 */
+#report-content table {
+    @apply text-sm md:text-base;
+}
+#report-content table th {
+    @apply font-bold;
+}
+#report-content table td {
+    @apply break-words;
+    word-break: break-word;
+}
+
