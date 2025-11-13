@@ -194,6 +194,60 @@ export function repopulateUiForResume(stepId) {
     if (journey.steps['post-read-3']) postReadQuestion3.value = journey.steps['post-read-3'].v1 || '';
 }
 
+// 네비게이션 바 업데이트
+export function updateNavigationBar(currentStepId) {
+    const navBar = document.getElementById("step-navigation");
+    if (!navBar) return;
+    
+    // 활동 뷰일 때만 네비게이션 바 표시
+    const activityView = document.getElementById("activity-view");
+    if (activityView && !activityView.classList.contains("hidden")) {
+        navBar.classList.remove("hidden");
+    } else {
+        navBar.classList.add("hidden");
+        return;
+    }
+    
+    const journey = currentUserJourney;
+    
+    // 각 단계의 완료 여부 확인
+    const stepStatus = {
+        'step-1-preread': !!(journey.steps?.['pre-read']?.note_v1 || journey.steps?.['pre-read']?.note_v2),
+        'step-2-duringread': !!(journey.steps?.['during-read']?.v1 || journey.steps?.['during-read']?.v2),
+        'step-3-adjustment': !!(journey.steps?.['adjustment']?.choice),
+        'step-4-postread': !!(journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-1']?.v2 || 
+                              journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-2']?.v2 ||
+                              journey.steps?.['post-read-3']?.v1 || journey.steps?.['post-read-3']?.v2),
+        'step-7-feedback-summary': !!(journey.steps?.['post-read-1']?.v1 || journey.steps?.['post-read-2']?.v1 || journey.steps?.['post-read-3']?.v1),
+        'step-6-report': false // 보고서는 별도로 확인
+    };
+    
+    // 모든 네비게이션 버튼 업데이트
+    document.querySelectorAll('.nav-step-btn').forEach(btn => {
+        const stepId = btn.dataset.step;
+        const checkIcon = btn.querySelector('.nav-step-check');
+        const isCompleted = stepStatus[stepId] || false;
+        const isActive = stepId === currentStepId;
+        
+        // 체크 표시 업데이트
+        if (isCompleted) {
+            checkIcon.classList.remove("hidden");
+        } else {
+            checkIcon.classList.add("hidden");
+        }
+        
+        // 활성 상태 스타일 업데이트
+        btn.classList.remove("bg-amber-500", "text-white", "bg-gray-100", "text-gray-700", "bg-amber-100", "text-amber-700", "bg-green-50", "text-green-700", "border", "border-green-300");
+        if (isActive) {
+            btn.classList.add("bg-amber-500", "text-white");
+        } else if (isCompleted) {
+            btn.classList.add("bg-green-50", "text-green-700", "border", "border-green-300");
+        } else {
+            btn.classList.add("bg-gray-100", "text-gray-700");
+        }
+    });
+}
+
 // 힌트 표시
 export function showHint(stage) {
     const articleType = currentArticleData ? currentArticleData.type : document.getElementById("article-type").value;
