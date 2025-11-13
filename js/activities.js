@@ -353,6 +353,11 @@ export async function handlePostReadSubmit() {
     hideLoading();
     repopulateUiForResume('step-7-feedback-summary'); 
     saveStateToLocal('step-7-feedback-summary'); 
+    
+    // 네비게이션 바 업데이트 (자동 체크 표시)
+    updateNavigationBar('step-4-postread');
+    
+    // 모든 필수 단계 완료 시 피드백 요약 화면으로 이동
     buildFeedbackSummaryView(); 
     showStep('step-7-feedback-summary');
     updateNavigationBar('step-7-feedback-summary');
