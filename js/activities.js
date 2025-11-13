@@ -52,6 +52,16 @@ export async function handlePreReadSubmit() {
 let questionCounter = 0;
 export function addQuestionField() {
     const container = document.getElementById("duringread-questions-container");
+    if (!container) {
+        console.error("질문 컨테이너를 찾을 수 없습니다.");
+        return;
+    }
+    
+    if (!currentArticleData) {
+        console.error("글 데이터가 없습니다.");
+        return;
+    }
+    
     const questionId = `question-${questionCounter++}`;
     
     const questionTypes = currentArticleData.type === '설명하는 글'
@@ -80,9 +90,9 @@ export function addQuestionField() {
                 ${questionTypes.map(type => `<option value="${type.value}">${type.label}</option>`).join('')}
             </select>
             <label class="block text-sm font-semibold text-gray-700 mb-1">질문</label>
-            <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요"></textarea>
+            <textarea class="question-text w-full px-3 py-2 bg-white border border-gray-300 rounded-lg mb-3 text-sm" rows="2" placeholder="질문을 입력하세요" data-question-id="${questionId}"></textarea>
             <label class="block text-sm font-semibold text-gray-700 mb-1">답</label>
-            <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요"></textarea>
+            <textarea class="question-answer w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" rows="3" placeholder="질문에 대한 답을 입력하세요" data-question-id="${questionId}"></textarea>
         </div>
     `;
     

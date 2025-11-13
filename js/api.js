@@ -38,13 +38,17 @@ export async function checkSafety(text) {
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
     const prompt = `
-        다음 텍스트에 부적절한(unsafe) 콘텐츠(욕설, 비방, 혐오 발언, 성적 표현, 폭력적 표현 등)가 포함되어 있는지 동적으로 분석해줘.
+        다음 텍스트에 부적절한(unsafe) 콘텐츠가 포함되어 있는지 동적으로 분석해줘.
         텍스트: "${text}"
 
+        [검사 항목]
+        1. 욕설, 비방, 혐오 발언, 성적 표현, 폭력적 표현
+        2. 현재 살아있는 정치인(대통령, 국회의원, 시장, 도지사 등)의 이름이나 언급
+        
         응답은 다음 JSON 형식으로만 해줘:
         {"safety": "SAFE" 또는 "UNSAFE: [구체적인 이유]"}
         
-        주의: 하드코딩된 단어 목록이 아닌, 문맥과 의미를 고려하여 동적으로 판단해줘.
+        주의: 하드코딩된 단어 목록이 아닌, 문맥과 의미를 고려하여 동적으로 판단해줘. 특히 현재 살아있는 정치인 언급은 교육적 목적에 부적절하므로 반드시 차단해줘.
     `;
     const payload = {
         contents: [{ parts: [{ text: prompt }] }],
@@ -312,6 +316,7 @@ export async function generateText(type, topic) {
         - 각 문단은 최소 5문장 이상이어야 해.
         - 문단 구분은 \\n\\n을 사용해줘.
         - 초등학교 4학년 수준의 어휘와 문장 구조를 사용해줘.
+        - 현재 살아있는 정치인(대통령, 국회의원, 시장, 도지사 등)의 이름이나 언급은 절대 포함하지 말아줘. 교육적 목적에 부적절합니다.
         
         반드시 다음 JSON 형식에 맞춰서 응답해줘.
         {
