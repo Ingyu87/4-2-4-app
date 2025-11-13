@@ -7,10 +7,12 @@ export let currentUserJourney = {};
 export let feedbackQueue = [];
 export let isFeedbackRunning = false;
 
-// Gemini API 키 로드 (Gemini Canvas 환경 변수 또는 localStorage)
+// Gemini API 키 로드 (환경 변수 우선순위: Gemini Canvas > Vercel > window > localStorage)
 export let geminiApiKey = typeof __gemini_api_key !== 'undefined' 
     ? __gemini_api_key 
-    : (typeof window.__gemini_api_key !== 'undefined' 
-        ? window.__gemini_api_key 
-        : localStorage.getItem('geminiApiKey') || "");
+    : (typeof window !== 'undefined' && window.__GEMINI_API_KEY__ && window.__GEMINI_API_KEY__ !== '%GEMINI_API_KEY%'
+        ? window.__GEMINI_API_KEY__
+        : (typeof window !== 'undefined' && window.__gemini_api_key
+            ? window.__gemini_api_key
+            : (typeof window !== 'undefined' && localStorage.getItem('geminiApiKey') || "")));
 

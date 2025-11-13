@@ -1,0 +1,12 @@
+{
+  "name": "4-2-4-app",
+  "version": "1.0.0",
+  "description": "AI 글쓰기 교실",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "engines": {
+    "node": ">=14.x"
+  }
+}
+

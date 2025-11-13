@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="styles.css">
     <!-- JavaScript 모듈 -->
     <script type="module" src="js/main.js"></script>
+    <!-- Vercel 환경 변수 주입 -->
+    <script>
+        // Vercel 환경 변수를 window 객체에 주입 (빌드 타임에 주입됨)
+        window.__GEMINI_API_KEY__ = '%GEMINI_API_KEY%';
+    </script>
 </head>
 <body class="text-gray-800 bg-gradient-to-br from-yellow-50 via-white to-white">
 
