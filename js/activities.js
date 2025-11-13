@@ -217,8 +217,9 @@ export async function handleAdjustmentSubmit() {
         adjustmentText = "특별히 이해하기 어려운 부분 없음.";
         details = { ...details, choice: "no" };
         
-        await saveActivity("adjustment", adjustmentText, details);
+        const safetyResult = await saveActivity("adjustment", adjustmentText, details);
         hideLoading();
+        if (safetyResult !== "SAFE") return;
 
         if (!isRevision) {
             currentUserJourney.steps['adjustment'] = { choice: "no" };
