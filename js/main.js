@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (nickname.trim() === "") {
-            showModal("알림", "닉네임을 입력해주세요.");
+            showModal("알림", "번호를 입력해주세요.");
             return;
         }
 
