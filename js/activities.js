@@ -122,9 +122,18 @@ export async function handleDuringReadSubmit() {
     
     for (const item of questionItems) {
         const questionId = item.dataset.questionId;
-        const type = item.querySelector(`.question-type[data-question-id="${questionId}"]`).value;
-        const question = item.querySelector(`.question-text[data-question-id="${questionId}"]`).value.trim();
-        const answer = item.querySelector(`.question-answer[data-question-id="${questionId}"]`).value.trim();
+        const typeSelect = item.querySelector(`.question-type[data-question-id="${questionId}"]`);
+        const questionTextarea = item.querySelector(`.question-text[data-question-id="${questionId}"]`);
+        const answerTextarea = item.querySelector(`.question-answer[data-question-id="${questionId}"]`);
+        
+        if (!typeSelect || !questionTextarea || !answerTextarea) {
+            console.error("질문 필드를 찾을 수 없습니다:", questionId);
+            continue;
+        }
+        
+        const type = typeSelect.value;
+        const question = questionTextarea.value.trim();
+        const answer = answerTextarea.value.trim();
         
         if (question === "") {
             showModal("알림", "모든 질문을 입력해주세요.");
