@@ -184,12 +184,30 @@ export async function downloadReport() {
     showLoading("보고서 이미지 생성 중... (조금 오래 걸릴 수 있어요)");
     
     try {
-        document.getElementById("activity-view").parentElement.scrollTop = 0;
+        // 스크롤을 맨 위로 이동하여 전체 보고서가 보이도록 함
+        const activityView = document.getElementById("activity-view");
+        if (activityView && activityView.parentElement) {
+            activityView.parentElement.scrollTop = 0;
+        }
+        window.scrollTo(0, 0);
         
+        // 보고서 요소의 전체 높이와 너비 계산
+        const elementHeight = reportElement.scrollHeight;
+        const elementWidth = reportElement.scrollWidth;
+        
+        // html2canvas로 전체 보고서 캡처 (전체 높이와 너비 명시)
         const canvas = await html2canvas(reportElement, {
             scale: 1.5,
-            useCORS: true, 
-            backgroundColor: '#ffffff' 
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            height: elementHeight,
+            width: elementWidth,
+            scrollY: -window.scrollY,
+            scrollX: -window.scrollX,
+            windowWidth: elementWidth,
+            windowHeight: elementHeight,
+            allowTaint: false,
+            logging: false
         });
         
         const link = document.createElement('a');
