@@ -14,7 +14,12 @@ export async function saveActivity(stage, text, details = {}) {
 
     const safetyResult = await checkSafety(text);
     if (safetyResult !== "SAFE") {
-        showModal("부적절한 내용", `작성한 내용에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);
+        // 안전성 검사 실패 시 즉시 모달 표시 (await로 모달이 완전히 표시될 때까지 대기)
+        await new Promise((resolve) => {
+            showModal("부적절한 내용", `작성한 내용에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);
+            // 모달이 표시된 후 약간의 지연을 두어 사용자가 모달을 볼 수 있도록 함
+            setTimeout(resolve, 100);
+        });
         return safetyResult;
     }
 
@@ -47,7 +52,7 @@ export async function handlePreReadSubmit() {
     // 네비게이션 바 업데이트 (자동 체크 표시)
     updateNavigationBar('step-1-preread');
     
-    // 수정 모드가 아니면 다음 단계로 이동
+    // 안전성 검사 통과 후 즉시 다음 단계로 이동
     if (!isRevision) {
         showStep('step-2-duringread');
         updateNavigationBar('step-2-duringread');
@@ -188,7 +193,7 @@ export async function handleDuringReadSubmit() {
     // 네비게이션 바 업데이트 (자동 체크 표시)
     updateNavigationBar('step-2-duringread');
     
-    // 수정 모드가 아니면 다음 단계로 이동
+    // 안전성 검사 통과 후 즉시 다음 단계로 이동
     if (!isRevision) {
         showStep('step-3-adjustment');
         updateNavigationBar('step-3-adjustment');
@@ -256,7 +261,7 @@ export async function handleAdjustmentSubmit() {
     // 네비게이션 바 업데이트 (자동 체크 표시)
     updateNavigationBar('step-3-adjustment');
     
-    // 수정 모드가 아니면 다음 단계로 이동
+    // 안전성 검사 통과 후 즉시 다음 단계로 이동
     if (!isRevision) {
         showStep('step-4-postread');
         updateNavigationBar('step-4-postread');
@@ -297,7 +302,12 @@ export async function handlePostReadSubmit() {
     if (q1_safety !== "SAFE" || q2_safety !== "SAFE" || q3_safety !== "SAFE") {
         hideLoading();
         const errorMsg = [q1_safety, q2_safety, q3_safety].filter(s => s !== "SAFE").join(", ");
-        showModal("부적절한 내용", `작성한 내용에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${errorMsg.replace("UNSAFE: ", "")})`);
+        // 안전성 검사 실패 시 즉시 모달 표시 (await로 모달이 완전히 표시될 때까지 대기)
+        await new Promise((resolve) => {
+            showModal("부적절한 내용", `작성한 내용에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${errorMsg.replace("UNSAFE: ", "")})`);
+            // 모달이 표시된 후 약간의 지연을 두어 사용자가 모달을 볼 수 있도록 함
+            setTimeout(resolve, 100);
+        });
         return;
     }
 
