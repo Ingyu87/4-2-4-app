@@ -219,23 +219,63 @@ async function downloadElementAsPNG(element, filename, loadingMessage) {
         // 요소가 보이도록 스크롤
         element.scrollIntoView({ behavior: 'instant', block: 'start' });
         
-        // 요소의 전체 높이와 너비 계산
-        const elementHeight = element.scrollHeight;
-        const elementWidth = element.scrollWidth;
+        // 렌더링이 완료될 때까지 대기
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        // html2canvas로 요소 캡처
+        // 요소의 전체 높이와 너비 계산 (더 정확하게)
+        const rect = element.getBoundingClientRect();
+        const elementHeight = Math.max(element.scrollHeight, element.offsetHeight, rect.height);
+        const elementWidth = Math.max(element.scrollWidth, element.offsetWidth, rect.width);
+        
+        // 원본 요소의 ID와 클래스를 저장 (onclone에서 사용)
+        const elementId = element.id;
+        const elementClass = element.className;
+        
+        // html2canvas로 요소 캡처 (height 제한 제거하여 전체 내용 캡처)
         const canvas = await html2canvas(element, {
             scale: 1.5,
             useCORS: true,
             backgroundColor: '#ffffff',
-            height: elementHeight,
             width: elementWidth,
-            scrollY: -window.scrollY,
-            scrollX: -window.scrollX,
-            windowWidth: elementWidth,
-            windowHeight: elementHeight,
+            scrollY: 0,
+            scrollX: 0,
             allowTaint: false,
-            logging: false
+            logging: false,
+            onclone: (clonedDoc) => {
+                // 클론된 문서에서 요소 찾기
+                let clonedElement = null;
+                if (elementId) {
+                    clonedElement = clonedDoc.getElementById(elementId);
+                }
+                if (!clonedElement && elementClass) {
+                    // 클래스로 찾기 시도
+                    const classParts = elementClass.split(' ').filter(c => c);
+                    if (classParts.length > 0) {
+                        const classSelector = '.' + classParts.join('.');
+                        clonedElement = clonedDoc.querySelector(classSelector);
+                    }
+                }
+                if (clonedElement) {
+                    // 클론된 요소의 스타일 조정하여 전체 내용이 보이도록
+                    clonedElement.style.overflow = 'visible';
+                    clonedElement.style.height = 'auto';
+                    clonedElement.style.maxHeight = 'none';
+                    clonedElement.style.overflowY = 'visible';
+                    clonedElement.style.overflowX = 'visible';
+                    // 부모 요소들도 확인하여 overflow 제한 제거
+                    let parent = clonedElement.parentElement;
+                    while (parent && parent !== clonedDoc.body) {
+                        if (parent.style) {
+                            parent.style.overflow = 'visible';
+                            parent.style.overflowY = 'visible';
+                            parent.style.overflowX = 'visible';
+                            parent.style.height = 'auto';
+                            parent.style.maxHeight = 'none';
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+            }
         });
         
         const link = document.createElement('a');
