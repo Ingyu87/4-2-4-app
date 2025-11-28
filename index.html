@@ -41,39 +41,45 @@
 <body class="text-gray-800 bg-gradient-to-br from-yellow-50 via-white to-white">
 
     <!-- 메인 컨테이너 -->
-    <div class="container mx-auto max-w-4xl p-4">
+    <div class="container mx-auto max-w-4xl p-3 sm:p-4 md:p-6">
 
         <!-- 네비게이션 바 (활동 뷰에서만 표시) -->
-        <div id="step-navigation" class="hidden mb-6 bg-white rounded-2xl shadow-lg p-4 border border-gray-200">
-            <div class="flex flex-wrap gap-2 md:gap-3 justify-center items-center">
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-1-preread">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>1️⃣ 읽기 전</span>
+        <div id="step-navigation" class="hidden mb-4 md:mb-6 bg-white rounded-2xl shadow-lg p-2 md:p-4 border border-gray-200">
+            <div class="flex flex-wrap gap-1 md:gap-3 justify-center items-center text-xs md:text-sm">
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-1-preread">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden sm:inline">1️⃣ 읽기 전</span>
+                    <span class="sm:hidden">1️⃣</span>
                 </button>
-                <div class="text-gray-300">→</div>
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-2-duringread">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>2️⃣ 읽기 중</span>
+                <div class="text-gray-300 text-xs md:text-base">→</div>
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-2-duringread">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden sm:inline">2️⃣ 읽기 중</span>
+                    <span class="sm:hidden">2️⃣</span>
                 </button>
-                <div class="text-gray-300">→</div>
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-3-adjustment">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>🧑‍🏫 읽기 점검</span>
+                <div class="text-gray-300 text-xs md:text-base">→</div>
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-3-adjustment">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden md:inline">🧑‍🏫 읽기 점검</span>
+                    <span class="md:hidden">🧑‍🏫</span>
                 </button>
-                <div class="text-gray-300">→</div>
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-4-postread">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>3️⃣ 읽기 후</span>
+                <div class="text-gray-300 text-xs md:text-base">→</div>
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-4-postread">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden sm:inline">3️⃣ 읽기 후</span>
+                    <span class="sm:hidden">3️⃣</span>
                 </button>
-                <div class="text-gray-300">→</div>
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-7-feedback-summary">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>📝 피드백</span>
+                <div class="text-gray-300 text-xs md:text-base">→</div>
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-7-feedback-summary">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden sm:inline">📝 피드백</span>
+                    <span class="sm:hidden">📝</span>
                 </button>
-                <div class="text-gray-300">→</div>
-                <button class="nav-step-btn px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-6-report">
-                    <span class="nav-step-check hidden text-green-600 mr-1">✓</span>
-                    <span>📊 보고서</span>
+                <div class="text-gray-300 text-xs md:text-base">→</div>
+                <button class="nav-step-btn px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95" data-step="step-6-report">
+                    <span class="nav-step-check hidden text-green-600 mr-0.5 md:mr-1">✓</span>
+                    <span class="hidden sm:inline">📊 보고서</span>
+                    <span class="sm:hidden">📊</span>
                 </button>
             </div>
         </div>
@@ -99,14 +105,14 @@
                         <p class="text-sm text-blue-800 font-semibold mb-1">📌 안전한 AI 활용 약속</p>
                         <p class="text-xs text-blue-700">안전한 AI 활용을 위해 비교육적인 글은 작성하지 않기로 약속해요.</p>
                     </div>
-                    <button id="login-button" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg">활동 시작!</button>
+                    <button id="login-button" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-base md:text-lg">활동 시작!</button>
                 </div>
             </div>
         </div>
 
         <!-- 2. 글 설정 뷰 -->
         <div id="config-view" class="view hidden">
-            <div class="my-12 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+            <div class="my-6 sm:my-8 md:my-12 bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100">
                 <h1 class="text-2xl font-bold text-gray-800 mb-6">어떤 글을 읽어볼까요?</h1>
                 <div class="space-y-6">
                     <div>
@@ -130,7 +136,7 @@
                         <input type="text" id="article-topic" class="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-amber-400 text-lg" placeholder="예) 우주, 바다, AI (비워두면 AI가 추천)">
                     </div>
                     
-                    <button id="generate-button" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg">
+                    <button id="generate-button" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-base md:text-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 11-8.486-4.95M19.071 16.071a5 5 0 01-4.95 8.486m-4.95-8.486l.99 1.714" />
                         </svg>
@@ -145,7 +151,7 @@
 
         <!-- 3. 활동 뷰 (단계별) -->
         <div id="activity-view" class="view hidden">
-            <div class="my-12 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+            <div class="my-6 sm:my-8 md:my-12 bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100">
 
                 <!-- 3-1. 읽기 전 단계 -->
                 <div id="step-1-preread" class="step-view">
@@ -154,12 +160,12 @@
                     </div>
                     <h2 id="preread-title" class="text-2xl font-bold mb-4">...</h2>
                     
-                    <div class="flex justify-between items-center mb-2">
-                        <label id="preread-label" for="preread-question" class="block text-lg font-semibold text-gray-800">제목을 보고 예상되는 내용이나 배경지식을 적어보세요.</label>
-                        <button id="preread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm flex-shrink-0 ml-4">힌트 💡</button>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
+                        <label id="preread-label" for="preread-question" class="block text-base md:text-lg font-semibold text-gray-800 flex-1">제목을 보고 예상되는 내용이나 배경지식을 적어보세요.</label>
+                        <button id="preread-hint" class="px-3 py-1.5 md:px-4 md:py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-xs md:text-sm flex-shrink-0 sm:ml-4 self-start sm:self-auto">힌트 💡</button>
                     </div>
                     <textarea id="preread-question" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="예) 이 글은 ...에 대해 설명하는 글일 것 같다."></textarea>
-                    <button id="preread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 !py-3 text-lg">제출하기</button>
+                    <button id="preread-submit" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-4 md:mt-6 text-base md:text-lg">제출하기</button>
                 </div>
 
                 <!-- 3-2. 읽기 중 단계 -->
@@ -176,9 +182,9 @@
                         <p class="text-sm text-blue-800 font-semibold mb-1">📌 읽기 중 활동</p>
                         <p class="text-xs text-blue-700">글을 읽으면서 <strong>궁금한 점이나 핵심 내용에 대해 질문을 만들고 답</strong>해보세요. 이 단계에서는 글의 내용을 이해하기 위한 질문을 만드는 것이 중요합니다.</p>
                     </div>
-                    <div class="flex justify-between items-center mb-4">
-                        <label id="duringread-label" class="block text-lg font-semibold text-gray-800">글을 읽으며 궁금한 점이나 핵심 내용에 대해 질문을 만들어 보세요.</label>
-                        <button id="duringread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm flex-shrink-0 ml-4">힌트 💡</button>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                        <label id="duringread-label" class="block text-base md:text-lg font-semibold text-gray-800 flex-1">글을 읽으며 궁금한 점이나 핵심 내용에 대해 질문을 만들어 보세요.</label>
+                        <button id="duringread-hint" class="px-3 py-1.5 md:px-4 md:py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-xs md:text-sm flex-shrink-0 sm:ml-4 self-start sm:self-auto">힌트 💡</button>
                     </div>
                     
                     <div id="duringread-questions-container" class="space-y-4 mb-4">
@@ -188,7 +194,7 @@
                     <button id="duringread-add-question" class="w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-all duration-200 mb-4">
                         + 질문 추가하기
                     </button>
-                    <button id="duringread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg">제출하기</button>
+                    <button id="duringread-submit" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-base md:text-lg">제출하기</button>
                 </div>
 
                 <!-- 3-3. 읽기 조정 단계 -->
@@ -204,32 +210,32 @@
                         </div>
                         <div>
                             <p class="text-lg font-semibold text-gray-800 mb-3">글을 읽다가 내용이 이해되지 않거나<br>막히는 부분이 있었나요?</p>
-                            <div class="flex space-x-4">
-                                <label class="flex items-center p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
-                                    <input type="radio" name="adjustment-choice" value="no" class="h-5 w-5 text-amber-600" checked>
-                                    <span class="ml-3 text-lg">아니요, 없었어요.</span>
-                                </label>
-                                <label class="flex items-center p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
-                                    <input type="radio" name="adjustment-choice" value="yes" class="h-5 w-5 text-amber-600">
-                                    <span class="ml-3 text-lg">네, 있었어요.</span>
-                                </label>
-                            </div>
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                            <label class="flex items-center p-3 md:p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
+                                <input type="radio" name="adjustment-choice" value="no" class="h-4 w-4 md:h-5 md:w-5 text-amber-600" checked>
+                                <span class="ml-2 md:ml-3 text-base md:text-lg">아니요, 없었어요.</span>
+                            </label>
+                            <label class="flex items-center p-3 md:p-4 rounded-xl border-2 border-gray-200 flex-1 hover:border-amber-400 transition">
+                                <input type="radio" name="adjustment-choice" value="yes" class="h-4 w-4 md:h-5 md:w-5 text-amber-600">
+                                <span class="ml-2 md:ml-3 text-base md:text-lg">네, 있었어요.</span>
+                            </label>
+                        </div>
                         </div>
                         <div id="adjustment-solution-group" class="hidden">
                             <label for="adjustment-solution" class="block text-lg font-semibold text-gray-800 mb-2">어떻게 해결했는지 알려주세요!</label>
                             <textarea id="adjustment-solution" rows="5" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="예) 낱말의 뜻을 짐작해 보았어요. / 앞 문장을 다시 천천히 읽어보았어요."></textarea>
                         </div>
-                        <button id="adjustment-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-4 !py-3 text-lg">제출하기</button>
+                        <button id="adjustment-submit" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-4 text-base md:text-lg">제출하기</button>
                     </div>
                 </div>
 
                 <!-- 3-4. 읽기 후 단계 -->
                 <div id="step-4-postread" class="step-view hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="inline-block bg-amber-100 text-amber-700 text-base font-semibold px-4 py-1 rounded-full">3️⃣ 읽기 후</span>
-                        <div class="flex gap-2">
-                            <button class="btn-view-article px-4 py-2 bg-sky-100 text-sky-700 font-semibold rounded-full hover:bg-sky-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm">글 다시보기 📖</button>
-                            <button id="postread-hint" class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-sm">힌트 💡</button>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                        <span class="inline-block bg-amber-100 text-amber-700 text-sm md:text-base font-semibold px-3 py-1 md:px-4 rounded-full self-start">3️⃣ 읽기 후</span>
+                        <div class="flex gap-2 self-start sm:self-auto">
+                            <button class="btn-view-article px-3 py-1.5 md:px-4 md:py-2 bg-sky-100 text-sky-700 font-semibold rounded-full hover:bg-sky-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-xs md:text-sm">글 다시보기 📖</button>
+                            <button id="postread-hint" class="px-3 py-1.5 md:px-4 md:py-2 bg-amber-100 text-amber-700 font-semibold rounded-full hover:bg-amber-200 transition-all duration-200 ease-in-out hover:scale-105 active:scale-95 text-xs md:text-sm">힌트 💡</button>
                         </div>
                     </div>
                     <div class="space-y-6">
@@ -246,14 +252,14 @@
                             <textarea id="postread-question-3" rows="4" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:border-transparent text-base" placeholder="글쓴이의 의견과 내 생각을 비교해 보세요."></textarea>
                         </div>
                     </div>
-                    <button id="postread-submit" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 !py-3 text-lg">제출하기</button>
+                    <button id="postread-submit" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-4 md:mt-6 text-base md:text-lg">제출하기</button>
                 </div>
 
 
                 <!-- 3-6. 활동 보고서 단계 -->
                 <div id="step-6-report" class="step-view hidden">
-                    <h2 class="text-3xl font-bold text-center mb-8">🎉 활동 완료! 보고서가 생성되었습니다.</h2>
-                    <button id="download-report-button" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg mb-4">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 md:mb-8">🎉 활동 완료! 보고서가 생성되었습니다.</h2>
+                    <button id="download-report-button" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-base md:text-lg mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -262,7 +268,7 @@
                     <div id="report-content" class="border border-gray-200 rounded-2xl overflow-hidden">
                         <!-- JS로 내용이 채워집니다 -->
                     </div>
-                    <button id="restart-button-report" class="w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-8 !py-3 text-lg">
+                    <button id="restart-button-report" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 mt-6 md:mt-8 text-base md:text-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2a8.001 8.001 0 0015.357 2m0 0H15" />
                         </svg>
@@ -272,8 +278,8 @@
                 
                 <!-- 3-7. 종합 피드백 단계 -->
                 <div id="step-7-feedback-summary" class="step-view hidden">
-                    <h2 class="text-3xl font-bold text-center mb-4">✨ 활동 완료 및 종합 피드백</h2>
-                    <p class="text-center text-gray-600 mb-8">모든 활동을 완료했습니다! 아래에서 AI 피드백을 받고 활동을 수정해 보세요.</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-3 md:mb-4">✨ 활동 완료 및 종합 피드백</h2>
+                    <p class="text-center text-sm md:text-base text-gray-600 mb-6 md:mb-8">모든 활동을 완료했습니다! 아래에서 AI 피드백을 받고 활동을 수정해 보세요.</p>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <button id="feedback-get-all-button" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95">
@@ -286,7 +292,7 @@
                         <!-- JS (buildFeedbackSummaryView)로 내용이 채워집니다 -->
                     </div>
 
-                    <button id="generate-report-button" class="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-lg mt-8">
+                    <button id="generate-report-button" class="w-full px-4 py-2.5 md:px-6 md:py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-base md:text-lg mt-6 md:mt-8">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -305,28 +311,28 @@
         </div>
 
         <!-- 5. 공용 모달 -->
-        <div id="modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div id="modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-3 md:p-4">
             <div class="fixed inset-0 bg-black opacity-50"></div>
-            <div class="bg-white w-full max-w-md p-6 rounded-3xl shadow-xl z-50">
-                <h3 id="modal-title" class="text-xl font-bold text-amber-600 mb-4">...</h3>
-                <div id="modal-body" class="text-gray-700 mb-6 space-y-2">
+            <div class="bg-white w-full max-w-md p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-xl z-50 max-h-[90vh] overflow-y-auto">
+                <h3 id="modal-title" class="text-lg md:text-xl font-bold text-amber-600 mb-3 md:mb-4">...</h3>
+                <div id="modal-body" class="text-sm md:text-base text-gray-700 mb-4 md:mb-6 space-y-2">
                     ...
                 </div>
-                <button class="btn-close-modal w-full px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-2 !text-base">확인</button>
+                <button class="btn-close-modal w-full px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-sm md:text-base">확인</button>
             </div>
         </div>
 
         <!-- 6. 단계별 수정 모달 -->
-        <div id="edit-modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div id="edit-modal" class="hidden fixed inset-0 z-60 flex items-center justify-center p-3 md:p-4">
             <div class="fixed inset-0 bg-black opacity-50 edit-modal-backdrop"></div>
-            <div class="bg-white w-full max-w-2xl p-6 md:p-8 rounded-3xl shadow-xl z-50 max-h-[90vh] overflow-y-auto">
-                <h3 id="edit-modal-title" class="text-xl font-bold text-amber-600 mb-4">수정하기</h3>
-                <div id="edit-modal-body" class="text-gray-700 mb-6 space-y-4">
+            <div class="bg-white w-full max-w-2xl p-4 md:p-6 lg:p-8 rounded-2xl md:rounded-3xl shadow-xl z-50 max-h-[90vh] overflow-y-auto">
+                <h3 id="edit-modal-title" class="text-lg md:text-xl font-bold text-amber-600 mb-3 md:mb-4">수정하기</h3>
+                <div id="edit-modal-body" class="text-sm md:text-base text-gray-700 mb-4 md:mb-6 space-y-3 md:space-y-4">
                     <!-- 동적으로 채워짐 -->
                 </div>
-                <div class="flex gap-4">
-                    <button id="edit-modal-cancel" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-full shadow-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-base">취소</button>
-                    <button id="edit-modal-save" class="flex-1 px-6 py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 !py-3 text-base">저장</button>
+                <div class="flex flex-col sm:flex-row gap-2 md:gap-4">
+                    <button id="edit-modal-cancel" class="flex-1 px-4 py-2.5 md:px-6 md:py-3 bg-gray-100 text-gray-700 font-semibold rounded-full shadow-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-sm md:text-base">취소</button>
+                    <button id="edit-modal-save" class="flex-1 px-4 py-2.5 md:px-6 md:py-3 bg-amber-500 text-white font-semibold rounded-full shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl active:scale-95 text-sm md:text-base">저장</button>
                 </div>
             </div>
         </div>

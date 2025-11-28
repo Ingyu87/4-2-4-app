@@ -1,9 +1,16 @@
 body {
     font-family: 'Inter', 'Pretendard', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 .view {
     width: 100%;
     min-height: 100vh;
+}
+/* 모바일 터치 최적화 */
+button, a, input, textarea, select {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
@@ -60,13 +67,34 @@ select.input-field-box {
 }
 /* 보고서 표 스타일 */
 #report-content table {
-    @apply text-sm md:text-base;
+    @apply text-xs sm:text-sm md:text-base;
+    min-width: 100%;
 }
 #report-content table th {
     @apply font-bold;
+    @apply text-xs sm:text-sm md:text-base;
+    @apply px-2 py-2 sm:px-3 sm:py-3 md:px-4 md:py-3;
 }
 #report-content table td {
     @apply break-words;
     word-break: break-word;
+    @apply px-2 py-2 sm:px-3 sm:py-3 md:px-4 md:py-3;
+    @apply text-xs sm:text-sm md:text-base;
+}
+/* 보고서 컨테이너 모바일 대응 */
+#report-content {
+    @apply text-sm md:text-base;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+/* 보고서 섹션 제목 모바일 대응 */
+#report-content h1 {
+    @apply text-2xl sm:text-3xl;
+}
+#report-content h2 {
+    @apply text-xl sm:text-2xl;
+}
+#report-content h3 {
+    @apply text-lg sm:text-xl;
 }
 
