@@ -6,6 +6,26 @@ import { handleGenerateContent, handlePreReadSubmit, handleDuringReadSubmit, han
 import { buildFeedbackSummaryView as originalBuildFeedbackSummaryView, handleGetAllFeedback, handleEditStep } from './feedback.js';
 import { buildReport, downloadReport } from './report.js';
 
+function revealApiKeyInput() {
+    const apiKeyInputGroup = document.getElementById("api-key-input-group");
+    if (!apiKeyInputGroup) return;
+    apiKeyInputGroup.style.display = '';
+    apiKeyInputGroup.classList.remove('hidden');
+}
+
+function handleSafetyApiError(status) {
+    revealApiKeyInput();
+    let message = "안전성 검사 시스템 연결에 실패했습니다. 잠시 후 다시 시도해주세요.";
+    if (status === "ERROR:API_KEY_EXPIRED") {
+        message = "설정된 Gemini API 키가 만료되었습니다. 새 API 키를 입력한 뒤 다시 시도해주세요.";
+    } else if (status === "ERROR:API_KEY_INVALID") {
+        message = "Gemini API 키가 유효하지 않습니다. API 키를 다시 입력해주세요.";
+    } else if (status === "ERROR:MODEL_NOT_FOUND") {
+        message = "현재 설정된 AI 모델을 찾을 수 없습니다. 앱에서 자동으로 대체 모델을 시도하도록 수정되었습니다. 새로고침 후 다시 시도해주세요.";
+    }
+    showModal("API 키 오류", message);
+}
+
 // 초기화
 function initializeApp() {
     // 환경 변수에서 API 키가 설정되어 있으면 API 키 입력 필드 완전히 숨기기
@@ -64,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const apiKeyInput = document.getElementById("api-key-input").value.trim();
         const nickname = document.getElementById("nickname-input").value;
         
-        // 환경 변수에서 API 키가 없을 때만 입력값 사용
+        // 사용자가 입력한 API 키가 있으면 항상 우선 적용 (만료된 환경 키 대체 가능)
         let finalApiKey = geminiApiKey;
-        if (apiKeyInput && (!geminiApiKey || geminiApiKey.trim() === "" || geminiApiKey === '%GEMINI_API_KEY%')) {
+        if (apiKeyInput) {
             finalApiKey = apiKeyInput;
             setGeminiApiKey(apiKeyInput);
             localStorage.setItem('geminiApiKey', apiKeyInput);
@@ -86,6 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading("번호를 검토 중입니다...");
         const safetyResult = await checkSafety(nickname);
         hideLoading();
+        if (typeof safetyResult === "string" && (safetyResult.startsWith("ERROR:") || safetyResult.includes("API 오류") || safetyResult.includes("모델"))) {
+            handleSafetyApiError(safetyResult);
+            return;
+        }
         if (safetyResult !== "SAFE") {
             showModal("부적절한 내용", `입력한 번호에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);
             return;

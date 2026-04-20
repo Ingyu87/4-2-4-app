@@ -5,6 +5,26 @@ import { saveStateToLocal } from './storage.js';
 import { buildFeedbackSummaryView } from './feedback.js';
 import { generateText } from './api.js';
 
+function isSafetyApiError(status) {
+    return typeof status === 'string' && (
+        status.startsWith("ERROR:") ||
+        status.includes("API 오류") ||
+        status.includes("모델")
+    );
+}
+
+function showSafetyApiErrorModal(status) {
+    let message = "안전성 검사 시스템 연결에 실패했습니다. 잠시 후 다시 시도해주세요.";
+    if (status === "ERROR:API_KEY_EXPIRED") {
+        message = "설정된 Gemini API 키가 만료되었습니다. 새 API 키를 입력한 뒤 다시 시도해주세요.";
+    } else if (status === "ERROR:API_KEY_INVALID") {
+        message = "Gemini API 키가 유효하지 않습니다. API 키를 확인한 뒤 다시 시도해주세요.";
+    } else if (status === "ERROR:MODEL_NOT_FOUND") {
+        message = "현재 설정된 AI 모델을 찾을 수 없습니다. 앱에서 자동으로 대체 모델을 시도하도록 수정되었습니다. 새로고침 후 다시 시도해주세요.";
+    }
+    showModal("API 키 오류", message);
+}
+
 // 활동 저장 (안전성 검사 포함)
 export async function saveActivity(stage, text, details = {}) {
     if (!currentArticleId || !userNickname) {
@@ -13,6 +33,10 @@ export async function saveActivity(stage, text, details = {}) {
     }
 
     const safetyResult = await checkSafety(text);
+    if (isSafetyApiError(safetyResult)) {
+        showSafetyApiErrorModal(safetyResult);
+        return safetyResult;
+    }
     if (safetyResult !== "SAFE") {
         // 안전성 검사 실패 시 즉시 모달 표시 (await로 모달이 완전히 표시될 때까지 대기)
         await new Promise((resolve) => {
@@ -299,6 +323,13 @@ export async function handlePostReadSubmit() {
     const q2_safety = (q2.trim() !== "") ? await checkSafety(q2) : "SAFE";
     const q3_safety = (q3.trim() !== "" && currentArticleData.type !== '설명하는 글') ? await checkSafety(q3) : "SAFE";
     
+    const safetyApiErrors = [q1_safety, q2_safety, q3_safety].filter(isSafetyApiError);
+    if (safetyApiErrors.length > 0) {
+        hideLoading();
+        showSafetyApiErrorModal(safetyApiErrors[0]);
+        return;
+    }
+
     if (q1_safety !== "SAFE" || q2_safety !== "SAFE" || q3_safety !== "SAFE") {
         hideLoading();
         const errorMsg = [q1_safety, q2_safety, q3_safety].filter(s => s !== "SAFE").join(", ");
@@ -385,6 +416,11 @@ export async function handleGenerateContent() {
     if (topic.trim() !== "") {
         showLoading("주제를 검토 중입니다...");
         const safetyResult = await checkSafety(topic);
+        if (isSafetyApiError(safetyResult)) {
+            hideLoading();
+            showSafetyApiErrorModal(safetyResult);
+            return;
+        }
         if (safetyResult !== "SAFE") {
             hideLoading();
             showModal("부적절한 주제", `입력한 주제에 부적절한 단어가 포함되어 있습니다. 수정 후 다시 시도해주세요. (사유: ${safetyResult.replace("UNSAFE: ", "")})`);

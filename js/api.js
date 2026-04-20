@@ -1,6 +1,62 @@
 import { geminiApiKey } from './config.js';
 import { showModal } from './ui.js';
 
+const GEMINI_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
+];
+
+function buildApiUrl(model) {
+    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+}
+
+function parseApiErrorResponse(errorBody) {
+    try {
+        const parsed = JSON.parse(errorBody);
+        const details = parsed?.error?.details || [];
+        const reason = details?.[0]?.reason || '';
+        const message = parsed?.error?.message || '';
+        return { reason, message };
+    } catch (_) {
+        return { reason: '', message: errorBody || '' };
+    }
+}
+
+function toApiErrorCode(error) {
+    const reason = error?.reason || '';
+    const message = (error?.apiMessage || error?.message || '').toLowerCase();
+    if (message.includes('model') && (message.includes('not found') || message.includes('unsupported'))) {
+        return "ERROR:MODEL_NOT_FOUND";
+    }
+    if (reason === 'API_KEY_INVALID' || message.includes('api key')) {
+        if (message.includes('expired')) return "ERROR:API_KEY_EXPIRED";
+        return "ERROR:API_KEY_INVALID";
+    }
+    return "ERROR:SAFETY_API";
+}
+
+async function callGeminiWithModelFallback(payload) {
+    let lastError = null;
+    for (let i = 0; i < GEMINI_MODELS.length; i++) {
+        const model = GEMINI_MODELS[i];
+        try {
+            return await apiCallWithRetry(buildApiUrl(model), payload);
+        } catch (error) {
+            lastError = error;
+            const message = (error?.apiMessage || error?.message || '').toLowerCase();
+            const isModelIssue = error?.status === 404 || message.includes('model') || message.includes('not found') || message.includes('unsupported');
+            const hasNext = i < GEMINI_MODELS.length - 1;
+            if (isModelIssue && hasNext) {
+                console.warn(`Model ${model} unavailable. Trying next model.`);
+                continue;
+            }
+            throw error;
+        }
+    }
+    throw lastError || new Error("No available Gemini model.");
+}
+
 // API 호출 재시도 로직
 export async function apiCallWithRetry(url, payload, retries = 3, delay = 1000) {
     for (let i = 0; i < retries; i++) {
@@ -14,7 +70,12 @@ export async function apiCallWithRetry(url, payload, retries = 3, delay = 1000) 
             if (!response.ok) {
                 const errorBody = await response.text();
                 console.error("API Error Body:", errorBody);
-                throw new Error(`API Error: ${response.statusText}`);
+                const parsed = parseApiErrorResponse(errorBody);
+                const error = new Error(`API Error: ${response.status} ${response.statusText}`);
+                error.status = response.status;
+                error.reason = parsed.reason;
+                error.apiMessage = parsed.message;
+                throw error;
             }
             return await response.json();
 
@@ -36,7 +97,6 @@ export async function checkSafety(text) {
         return "UNSAFE: API 키 미설정";
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
     const prompt = `
         다음 텍스트에 부적절한(unsafe) 콘텐츠가 포함되어 있는지 동적으로 분석해줘.
         텍스트: "${text}"
@@ -65,7 +125,7 @@ export async function checkSafety(text) {
     };
 
     try {
-        const result = await apiCallWithRetry(apiUrl, payload);
+        const result = await callGeminiWithModelFallback(payload);
         if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
             const safetyResult = JSON.parse(result.candidates[0].content.parts[0].text);
             if (safetyResult.safety === "SAFE") {
@@ -77,14 +137,12 @@ export async function checkSafety(text) {
         return "UNSAFE: 응답 파싱 실패";
     } catch (error) {
         console.error("Safety check API error:", error);
-        return "UNSAFE: 안전성 검사 API 오류";
+        return toApiErrorCode(error);
     }
 }
 
 // AI 피드백 생성
 export async function getAIFeedback(noteOrQuestion, stage, articleType) {
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
-    
     const stageMap = {
         'pre-read': '읽기 전 (예상/배경지식)',
         'during-read': '읽기 중 (질문 만들기)',
@@ -218,7 +276,7 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    const result = await apiCallWithRetry(apiUrl, payload);
+    const result = await callGeminiWithModelFallback(payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return result.candidates[0].content.parts[0].text;
     }
@@ -227,8 +285,6 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
 
 // 최종 보고서 평가 생성
 export async function getAIReportEvaluation(journey, articleType) {
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
-    
     let journeySummary = `
         글 종류: ${articleType}
         글 제목: ${journey.articleTitle}
@@ -319,7 +375,7 @@ export async function getAIReportEvaluation(journey, articleType) {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    const result = await apiCallWithRetry(apiUrl, payload);
+    const result = await callGeminiWithModelFallback(payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return result.candidates[0].content.parts[0].text;
     }
@@ -328,8 +384,6 @@ export async function getAIReportEvaluation(journey, articleType) {
 
 // 난이도 '상' 고정
 export async function generateText(type, topic) {
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
-    
     const difficulty = "상";
     const difficultyMap = {
         "상": "초등학교 4학년 수준의 어휘를 사용하고, 최소 5문단 이상이며, 각 문단에 5문장 이상이 포함된 글 (약 800-1200자)",
@@ -380,7 +434,7 @@ export async function generateText(type, topic) {
         }
     };
 
-    const result = await apiCallWithRetry(apiUrl, payload);
+    const result = await callGeminiWithModelFallback(payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return JSON.parse(result.candidates[0].content.parts[0].text);
     }
