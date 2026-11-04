@@ -1,102 +1,27 @@
-import { geminiApiKey } from './config.js';
 import { showModal } from './ui.js';
 
-const GEMINI_MODELS = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash"
-];
+const API_ENDPOINT = '/api/gemini';
 
-function buildApiUrl(model) {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+async function callServerApi(operation, payload) {
+    const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operation, payload })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+        const error = new Error(data.error || `API Error: ${response.status}`);
+        error.status = response.status;
+        error.errorCode = data.errorCode;
+        throw error;
+    }
+    
+    return data;
 }
 
-function parseApiErrorResponse(errorBody) {
-    try {
-        const parsed = JSON.parse(errorBody);
-        const details = parsed?.error?.details || [];
-        const reason = details?.[0]?.reason || '';
-        const message = parsed?.error?.message || '';
-        return { reason, message };
-    } catch (_) {
-        return { reason: '', message: errorBody || '' };
-    }
-}
-
-function toApiErrorCode(error) {
-    const reason = error?.reason || '';
-    const message = (error?.apiMessage || error?.message || '').toLowerCase();
-    if (message.includes('model') && (message.includes('not found') || message.includes('unsupported'))) {
-        return "ERROR:MODEL_NOT_FOUND";
-    }
-    if (reason === 'API_KEY_INVALID' || message.includes('api key')) {
-        if (message.includes('expired')) return "ERROR:API_KEY_EXPIRED";
-        return "ERROR:API_KEY_INVALID";
-    }
-    return "ERROR:SAFETY_API";
-}
-
-async function callGeminiWithModelFallback(payload) {
-    let lastError = null;
-    for (let i = 0; i < GEMINI_MODELS.length; i++) {
-        const model = GEMINI_MODELS[i];
-        try {
-            return await apiCallWithRetry(buildApiUrl(model), payload);
-        } catch (error) {
-            lastError = error;
-            const message = (error?.apiMessage || error?.message || '').toLowerCase();
-            const isModelIssue = error?.status === 404 || message.includes('model') || message.includes('not found') || message.includes('unsupported');
-            const hasNext = i < GEMINI_MODELS.length - 1;
-            if (isModelIssue && hasNext) {
-                console.warn(`Model ${model} unavailable. Trying next model.`);
-                continue;
-            }
-            throw error;
-        }
-    }
-    throw lastError || new Error("No available Gemini model.");
-}
-
-// API 호출 재시도 로직
-export async function apiCallWithRetry(url, payload, retries = 3, delay = 1000) {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errorBody = await response.text();
-                console.error("API Error Body:", errorBody);
-                const parsed = parseApiErrorResponse(errorBody);
-                const error = new Error(`API Error: ${response.status} ${response.statusText}`);
-                error.status = response.status;
-                error.reason = parsed.reason;
-                error.apiMessage = parsed.message;
-                throw error;
-            }
-            return await response.json();
-
-        } catch (error) {
-            if (i === retries - 1) {
-                console.error("API 호출 최종 실패:", error);
-                throw error;
-            }
-            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-        }
-    }
-}
-
-// Gemini 안전성 검사 API
 export async function checkSafety(text) {
-    if (!geminiApiKey || geminiApiKey.trim() === "") {
-        console.error("Gemini API 키가 설정되지 않았습니다. 안전성 검사를 수행할 수 없습니다.");
-        showModal("시스템 오류", "안전성 검사 시스템을 사용할 수 없습니다. 관리자에게 문의해주세요.");
-        return "UNSAFE: API 키 미설정";
-    }
-
     const prompt = `
         다음 텍스트에 부적절한(unsafe) 콘텐츠가 포함되어 있는지 동적으로 분석해줘.
         텍스트: "${text}"
@@ -125,7 +50,7 @@ export async function checkSafety(text) {
     };
 
     try {
-        const result = await callGeminiWithModelFallback(payload);
+        const result = await callServerApi('checkSafety', payload);
         if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
             const safetyResult = JSON.parse(result.candidates[0].content.parts[0].text);
             if (safetyResult.safety === "SAFE") {
@@ -137,11 +62,10 @@ export async function checkSafety(text) {
         return "UNSAFE: 응답 파싱 실패";
     } catch (error) {
         console.error("Safety check API error:", error);
-        return toApiErrorCode(error);
+        return error.errorCode || "ERROR:SAFETY_API";
     }
 }
 
-// AI 피드백 생성
 export async function getAIFeedback(noteOrQuestion, stage, articleType) {
     const stageMap = {
         'pre-read': '읽기 전 (예상/배경지식)',
@@ -157,12 +81,10 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
     let prompt;
 
     if (isQuestionStage) {
-        // 질문 만들기 활동 피드백
         let questionFocusInfo = "";
         let questionExample = "";
         
         if (stage === 'during-read') {
-            // 읽기 중 질문 만들기
             if (articleType === '설명하는 글') {
                 questionFocusInfo = "이 글은 '설명하는 글'입니다. 학생의 질문이 다음에 초점을 맞추고 있는지 확인해주세요:\n- 자신이 예상한 내용이 글의 내용과 같은지 확인하는 질문\n- 각 부분의 중심 내용이나 중심 문장을 찾는 질문\n- 새롭게 알게 된 내용을 찾는 질문\n('무엇', '왜' 같은 의문사를 활용하여 정보, 사실, 중심 내용에 초점)";
                 questionExample = "예를 들어, '이 문단에서 가장 중요한 내용은 무엇일까?', '...은 왜 ...일까?' 같은 질문을 만들어 보면 좋아요.";
@@ -171,7 +93,6 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
                 questionExample = "예를 들어, '글쓴이의 주장은 ...인데, 그 이유는 타당할까?', '나라면 ...라고 주장하겠다' 같은 질문을 만들어 보면 좋아요.";
             }
         } else if (stage === 'post-read-2' && articleType === '설명하는 글') {
-            // 읽기 후 더 궁금한 점 (설명하는 글만)
             questionFocusInfo = "이 글은 '설명하는 글'입니다. 학생의 질문이 '글을 읽고 더 알고 싶은 내용'에 초점을 맞추고 있는지 확인해주세요. ('무엇', '왜' 활용하여 새롭게 알게 된 사실이나 중심 내용에 대한 추가 탐구)";
             questionExample = "예를 들어, '...은 왜 ...일까?', '...에 대해 더 찾아보고 싶다' 같은 질문을 만들어 보면 좋아요.";
         }
@@ -203,12 +124,10 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
             ${questionExample}
         `;
     } else {
-        // 내용 작성 활동 피드백
         let activityFocusInfo = "";
         let activityExample = "";
         
         if (stage === 'pre-read') {
-            // 읽기 전 활동
             if (articleType === '설명하는 글') {
                 activityFocusInfo = "이 글은 '설명하는 글'입니다. 학생의 활동이 다음에 집중했는지 확인해주세요:\n- 글의 제목이나 차례를 보며 내용을 예상했는지\n- 글의 주제와 관련하여 자신이 알고 있는 내용을 떠올렸는지";
                 activityExample = "예를 들어, '글의 주제와 관련해 알고 있던 경험이나 지식'도 함께 적어보면 글을 이해하는 데 도움이 될 거예요.";
@@ -217,7 +136,6 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
                 activityExample = "예를 들어, '이 주제에 대해 평소 어떻게 생각했는지'도 함께 적어보면 글쓴이의 의견과 비교하는 데 도움이 될 거예요.";
             }
         } else if (stage === 'post-read-1') {
-            // 읽기 후 1단계
             if (articleType === '설명하는 글') {
                 activityFocusInfo = "이 글은 '설명하는 글'입니다. 학생의 활동이 '글 전체의 내용을 요약하여 정리'했는지 확인해주세요. (중심 문장들을 활용한 요약)";
                 activityExample = "예를 들어, '각 문단의 중심 내용을 연결하여 글 전체를 한 문장으로 요약'해 보면 좋아요.";
@@ -226,19 +144,15 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
                 activityExample = "예를 들어, '글쓴이의 의견과 자신의 의견의 같은 점과 다른 점'을 더 자세히 비교해 보면 좋아요.";
             }
         } else if (stage === 'post-read-2' && articleType === '의견을 제시하는 글') {
-            // 읽기 후 2단계 (의견 글만 - 생각 변화)
             activityFocusInfo = "이 글은 '의견을 제시하는 글'입니다. 학생의 활동이 '글을 읽으면서 생각이 바뀌거나 발전한 부분'을 확인했는지 평가해주세요.";
             activityExample = "예를 들어, '전에는 ...라고 생각했는데, 이 글을 읽고 ...라고 생각이 바뀌었다'는 식으로 구체적으로 적어보면 좋아요.";
         } else if (stage === 'post-read-3') {
-            // 읽기 후 3단계 (의견 글만 - 나의 생각)
             activityFocusInfo = "이 글은 '의견을 제시하는 글'입니다. 학생의 활동이 '주제에 대한 자신의 생각'을 명확하게 정리했는지 확인해주세요.";
             activityExample = "예를 들어, '이 주제에 대해 나는 ...라고 생각한다'는 식으로 자신의 최종 의견을 명확하게 표현해 보면 좋아요.";
         } else if (stage === 'adjustment') {
-            // 읽기 조정
             activityFocusInfo = "학생이 '이해하기 어려운 부분을 어떻게 해결했는지' 구체적으로 설명했는지 확인해주세요.";
             activityExample = "예를 들어, '낱말의 뜻을 짐작해 보았어요', '앞 문장을 다시 천천히 읽어보았어요' 같은 구체적인 해결 방법을 적어보면 좋아요.";
         } else {
-            // 기본 (fallback)
             activityFocusInfo = (articleType === '설명하는 글')
                 ? "이 글은 '설명하는 글'입니다. 학생의 활동이 '정보, 사실, 중심 내용'에 집중했는지 확인해주세요."
                 : "이 글은 '의견을 제시하는 글'입니다. 학생의 활동이 '글쓴이의 주장, 이유의 타당성, 자신의 생각과 비교'에 집중했는지 확인해주세요.";
@@ -276,14 +190,13 @@ export async function getAIFeedback(noteOrQuestion, stage, articleType) {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    const result = await callGeminiWithModelFallback(payload);
+    const result = await callServerApi('getAIFeedback', payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return result.candidates[0].content.parts[0].text;
     }
     throw new Error("Gemini API에서 피드백을 생성하지 못했습니다.");
 }
 
-// 최종 보고서 평가 생성
 export async function getAIReportEvaluation(journey, articleType) {
     let journeySummary = `
         글 종류: ${articleType}
@@ -301,7 +214,6 @@ export async function getAIReportEvaluation(journey, articleType) {
 
     stepsOrder.forEach(step => {
         if (step.key === 'during-read' && step.questions) {
-            // 읽기 중 단계는 질문과 답을 구분하여 표시
             journeySummary += `\n- ${step.title}:\n`;
             step.questions.forEach((q, idx) => {
                 journeySummary += `  - 질문 ${idx + 1} (${q.type}): ${q.question}\n`;
@@ -375,14 +287,13 @@ export async function getAIReportEvaluation(journey, articleType) {
         contents: [{ parts: [{ text: prompt }] }]
     };
 
-    const result = await callGeminiWithModelFallback(payload);
+    const result = await callServerApi('getAIReportEvaluation', payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return result.candidates[0].content.parts[0].text;
     }
     throw new Error("Gemini API에서 최종 평가를 생성하지 못했습니다.");
 }
 
-// 난이도 '상' 고정
 export async function generateText(type, topic) {
     const difficulty = "상";
     const difficultyMap = {
@@ -434,10 +345,9 @@ export async function generateText(type, topic) {
         }
     };
 
-    const result = await callGeminiWithModelFallback(payload);
+    const result = await callServerApi('generateText', payload);
     if (result.candidates && result.candidates[0].content?.parts?.[0]?.text) {
         return JSON.parse(result.candidates[0].content.parts[0].text);
     }
     throw new Error("Gemini API에서 텍스트를 생성하지 못했습니다.");
 }
-
